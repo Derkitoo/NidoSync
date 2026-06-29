@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NidoSync — Votre emménagement, on s'en charge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #1A1A2E;
+      --cream:     #F7F4EF;
+      --accent:    #FF6B35;
+      --accent2:   #2EC4B6;
+      --muted:     #6B7280;
+      --card-bg:   #FFFFFF;
+      --border:    #E5E2DC;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 2rem;
+      background: rgba(247,244,239,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.3rem;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--accent); }
+    nav a.cta-nav {
+      background: var(--accent);
+      color: #fff;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    nav a.cta-nav:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 7rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 70% 60% at 80% 40%, rgba(46,196,182,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(255,107,53,0.08) 0%, transparent 60%);
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 700px;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent);
+      background: rgba(255,107,53,0.1);
+      padding: 0.35rem 0.9rem; border-radius: 50px;
+      margin-bottom: 1.5rem;
+    }
+    .eyebrow::before { content: '●'; font-size: 0.5rem; }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.5rem;
+      color: var(--ink);
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-cta {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-weight: 600; font-size: 1rem;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,53,0.4); }
+    .reassurance {
+      font-size: 0.875rem; color: var(--muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .reassurance::before { content: '✓'; color: var(--accent2); font-weight: 700; }
+
+    /* STATS */
+    .stats {
+      display: flex; flex-wrap: wrap; gap: 2rem;
+      padding: 2.5rem 2rem;
+      background: var(--ink);
+      color: #fff;
+    }
+    .stat {
+      flex: 1; min-width: 140px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding: 0.5rem;
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem; font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.85rem; color: rgba(255,255,255,0.6);
+      margin-top: 0.3rem;
+    }
+
+    /* SERVICES */
+    section { padding: 5rem 2rem; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent2);
+      margin-bottom: 0.75rem;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800; letter-spacing: -0.8px;
+      margin-bottom: 0.75rem;
+    }
+    .section-sub {
+      color: var(--muted); font-size: 1rem;
+      max-width: 480px; margin-bottom: 3rem;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      max-width: 1000px;
+    }
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+    .service-icon {
+      font-size: 2rem; margin-bottom: 1rem;
+      display: inline-block;
+    }
+    .service-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem; font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .service-card p {
+      font-size: 0.875rem; color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* HOW IT WORKS */
+    .how { background: var(--ink); color: #fff; }
+    .how h2 { color: #fff; }
+    .how .section-sub { color: rgba(255,255,255,0.5); }
+    .steps {
+      display: flex; flex-wrap: wrap; gap: 0;
+      max-width: 900px;
+      position: relative;
+    }
+    .step {
+      flex: 1; min-width: 200px;
+      padding: 2rem 1.5rem;
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '→';
+      position: absolute; right: -0.5rem; top: 2.2rem;
+      color: var(--accent); font-size: 1.2rem;
+      display: none;
+    }
+    @media(min-width: 600px) { .step:not(:last-child)::after { display: block; } }
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem; font-weight: 800;
+      color: var(--accent); opacity: 0.25;
+      line-height: 1; margin-bottom: 0.75rem;
+    }
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: #fff; margin-bottom: 0.4rem;
+    }
+    .step p { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+
+    /* FORM */
+    .form-section {
+      background: var(--cream);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      max-width: 520px; width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+    }
+    .form-card h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .form-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    .field { margin-bottom: 1.25rem; }
+    label {
+      display: block;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.4rem;
+    }
+    input, select, textarea {
+      width: 100%; padding: 0.85rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--ink);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    .services-check {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.6rem; margin-top: 0.5rem;
+    }
+    .check-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.875rem; cursor: pointer;
+    }
+    .check-item input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-submit {
+      width: 100%; margin-top: 1.5rem;
+      padding: 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none; border-radius: 50px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,53,0.4); }
+    .form-note {
+      text-align: center; font-size: 0.8rem;
+      color: var(--muted); margin-top: 1rem;
+    }
+
+    /* SUCCESS */
+    .success-msg {
+      display: none;
+      text-align: center; padding: 2rem;
+    }
+    .success-msg .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .success-msg h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem; font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .success-msg p { color: var(--muted); font-size: 0.9rem; }
+
+    /* FOOTER */
+    footer {
+      background: var(--ink); color: rgba(255,255,255,0.4);
+      text-align: center; padding: 2rem;
+      font-size: 0.8rem;
+    }
+    footer span { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem; }
+      .hero { padding: 6rem 1.25rem 3rem; }
+      section { padding: 3.5rem 1.25rem; }
+      .form-card { padding: 2rem 1.25rem; border-radius: 16px; }
+      .services-check { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Nido<span>Sync</span></div>
+    <a href="#contact" class="cta-nav">Être rappelé →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+      <div class="eyebrow">Conciergerie post-déménagement</div>
+      <h1>Vous venez d'emménager.<br /><em>On s'occupe du reste.</em></h1>
+      <p>Artisans, box internet, électricité, changement de serrure — tout ce qu'il faut pour être vraiment chez vous, sans passer des heures à chercher.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn-primary">Je veux être rappelé gratuitement →</a>
+        <span class="reassurance">Réponse sous 2h</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">14h</div>
+      <div class="stat-label">perdues en moyenne après un déménagement</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">8+</div>
+      <div class="stat-label">démarches à gérer seul</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24h</div>
+      <div class="stat-label">pour tout organiser avec NidoSync</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0€</div>
+      <div class="stat-label">de frais pour vous</div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-label">Ce qu'on gère pour vous</div>
+    <h2>Tout ce dont vous avez besoin<br />au bon moment</h2>
+    <p class="section-sub">On contacte les prestataires à votre place et on coordonne tout. Vous n'avez qu'un seul interlocuteur.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🔧</div>
+        <h3>Artisans de confiance</h3>
+        <p>Électricien, plombier, peintre, serrurier — des pros vérifiés dans votre nouvelle ville, disponibles rapidement.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📡</div>
+        <h3>Box & téléphone</h3>
+        <p>Transfert ou nouvelle souscription chez Free, Orange, SFR, Bouygues. On compare les offres et on gère le rendez-vous technicien.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">⚡</div>
+        <h3>Énergie</h3>
+        <p>Ouverture de contrat EDF, Engie, Total Énergie ou autre. Mise en service garantie pour votre date d'entrée.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔐</div>
+        <h3>Changement de serrure</h3>
+        <p>Intervention d'un serrurier certifié dans les 48h. Parce qu'on ne sait jamais combien d'anciens locataires ont les clés.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📦</div>
+        <h3>Stockage temporaire</h3>
+        <p>Besoin de garder des affaires quelques semaines ? On vous trouve un box sécurisé à deux pas de chez vous.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏠</div>
+        <h3>Et bien plus encore</h3>
+        <p>Assurance habitation, nettoyage, peinture, montage de meubles... Dites-nous ce dont vous avez besoin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-label" style="color:var(--accent2)">Comment ça marche</div>
+    <h2>Simple comme un appel</h2>
+    <p class="section-sub">Pas d'application à installer, pas de formulaire interminable. On fait le travail pour vous.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Vous remplissez le formulaire</h3>
+        <p>2 minutes. Votre adresse, vos besoins, votre date d'emménagement.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>On vous rappelle sous 2h</h3>
+        <p>Un conseiller dédié fait le point avec vous et prend tout en charge.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>On coordonne tout</h3>
+        <p>Rendez-vous, devis, confirmations — vous recevez juste un récap.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Vous profitez de votre nouveau chez-vous</h3>
+        <p>Sans stress, sans recherche, sans attente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="form-section" id="contact">
+    <div class="form-card">
+      <div id="form-content">
+        <h2>On vous rappelle<br />gratuitement</h2>
+        <p>Laissez-nous vos coordonnées, un conseiller vous contacte sous 2h ouvrées.</p>
+
+        <div class="field">
+          <label>Prénom & Nom</label>
+          <input type="text" id="name" placeholder="Marie Dupont" />
+        </div>
+        <div class="field">
+          <label>Téléphone</label>
+          <input type="tel" id="phone" placeholder="06 12 34 56 78" />
+        </div>
+        <div class="field">
+          <label>Ville d'arrivée</label>
+          <input type="text" id="city" placeholder="Paris, Lyon, Marseille..." />
+        </div>
+        <div class="field">
+          <label>Date d'emménagement</label>
+          <input type="date" id="date" />
+        </div>
+        <div class="field">
+          <label>Ce dont j'ai besoin</label>
+          <div class="services-check">
+            <label class="check-item"><input type="checkbox" value="artisans" /> Artisans</label>
+            <label class="check-item"><input type="checkbox" value="internet" /> Box internet</label>
+            <label class="check-item"><input type="checkbox" value="energie" /> Énergie</label>
+            <label class="check-item"><input type="checkbox" value="serrure" /> Serrure</label>
+            <label class="check-item"><input type="checkbox" value="stockage" /> Stockage</label>
+            <label class="check-item"><input type="checkbox" value="autre" /> Autre</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Message (optionnel)</label>
+          <textarea id="message" placeholder="Précisez vos besoins si nécessaire..."></textarea>
+        </div>
+        <button class="btn-submit" onclick="handleSubmit()">Je veux être rappelé gratuitement →</button>
+        <p class="form-note">🔒 Vos données restent confidentielles. Aucun démarchage commercial.</p>
+      </div>
+
+      <div class="success-msg" id="success">
+        <div class="icon">✅</div>
+        <h3>C'est noté !</h3>
+        <p>On vous rappelle dans les 2h ouvrées.<br />Bienvenue dans votre nouveau chez-vous 🏠</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 <span>NidoSync</span> — La conciergerie du déménagement · Paris, France</p>
+  </footer>
+
+  <script>
+    function handleSubmit() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const city = document.getElementById('city').value.trim();
+
+      if (!name || !phone || !city) {
+        alert('Merci de remplir au minimum votre nom, téléphone et ville d\'arrivée.');
+        return;
+      }
+
+      document.getElementById('form-content').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+    }
+
+    // Set min date to today
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+      dateInput.min = new Date().toISOString().split('T')[0];
+    }
+  </script>
+</body>
+</html>
