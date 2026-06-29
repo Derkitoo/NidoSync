@@ -1,514 +1,700 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NidoSync — Votre emménagement, on s'en charge</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NidoSync — Votre emménagement, on s'en charge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0D0D0D;
+  --white:#FAFAF7;
+  --off:#F2F0EB;
+  --orange:#E8541A;
+  --orange-light:#FFF0EA;
+  --teal:#1A9E82;
+  --teal-light:#E3F7F2;
+  --text-muted:#7A7870;
+  --border:#E2DFD8;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--sans);background:var(--white);color:var(--black);line-height:1.6;overflow-x:hidden}
 
-    :root {
-      --ink:       #1A1A2E;
-      --cream:     #F7F4EF;
-      --accent:    #FF6B35;
-      --accent2:   #2EC4B6;
-      --muted:     #6B7280;
-      --card-bg:   #FFFFFF;
-      --border:    #E5E2DC;
-    }
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 3rem;
+  background:rgba(250,250,247,0.82);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:var(--serif);font-size:1.5rem;color:var(--black);letter-spacing:-0.5px}
+.logo b{color:var(--orange);font-weight:400;font-style:italic}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:.875rem;font-weight:500;color:var(--text-muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--black)}
+.nav-cta{
+  background:var(--black);color:var(--white)!important;
+  padding:.55rem 1.25rem;border-radius:100px;
+  font-size:.8rem!important;font-weight:600!important;
+  letter-spacing:.02em;transition:background .2s!important;
+}
+.nav-cta:hover{background:#333!important;color:var(--white)!important}
 
-    html { scroll-behavior: smooth; }
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;align-items:center;
+  padding:8rem 3rem 4rem;
+  gap:4rem;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;
+  top:-200px;right:-200px;
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(232,84,26,.08) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+.hero-left{}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--orange);background:var(--orange-light);
+  padding:.35rem 1rem;border-radius:100px;margin-bottom:2rem;
+}
+.hero-tag span{width:6px;height:6px;background:var(--orange);border-radius:50%;display:inline-block}
+h1{
+  font-family:var(--serif);
+  font-size:clamp(3rem,5vw,4.5rem);
+  font-weight:400;line-height:1.05;
+  letter-spacing:-1px;
+  margin-bottom:1.5rem;
+}
+h1 i{color:var(--orange);font-style:italic}
+.hero-desc{
+  font-size:1.0625rem;color:var(--text-muted);font-weight:300;
+  max-width:440px;line-height:1.75;margin-bottom:2.5rem;
+}
+.hero-actions{display:flex;flex-direction:column;gap:1rem;align-items:flex-start}
+.btn-main{
+  display:inline-flex;align-items:center;gap:.75rem;
+  background:var(--orange);color:#fff;
+  padding:1rem 2rem;border-radius:100px;
+  font-size:1rem;font-weight:600;text-decoration:none;
+  transition:transform .25s,box-shadow .25s;
+  box-shadow:0 4px 24px rgba(232,84,26,.25);
+}
+.btn-main:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(232,84,26,.35)}
+.btn-main svg{transition:transform .25s}
+.btn-main:hover svg{transform:translateX(4px)}
+.trust{display:flex;align-items:center;gap:.75rem;font-size:.8125rem;color:var(--text-muted)}
+.trust-dots{display:flex;gap:-.25rem}
+.trust-dot{
+  width:28px;height:28px;border-radius:50%;border:2px solid var(--white);
+  background:var(--off);display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:var(--text-muted);
+  margin-left:-6px;
+}
+.trust-dot:first-child{margin-left:0}
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--cream);
-      color: var(--ink);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
+/* Hero right — floating card */
+.hero-right{position:relative;display:flex;align-items:center;justify-content:center}
+.hero-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:2rem;
+  width:100%;max-width:380px;
+  box-shadow:0 24px 64px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);
+  position:relative;z-index:1;
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.card-title{font-size:.8125rem;font-weight:600;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase}
+.status-pill{
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--teal-light);color:var(--teal);
+  font-size:.7rem;font-weight:700;letter-spacing:.04em;
+  padding:.3rem .75rem;border-radius:100px;text-transform:uppercase;
+}
+.status-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.service-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.service-row{
+  display:flex;align-items:center;gap:.875rem;
+  padding:.75rem 1rem;
+  background:var(--off);border-radius:12px;
+  transition:background .2s;
+}
+.service-row:hover{background:#EAE7E0}
+.service-ico{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.service-ico.orange{background:var(--orange-light)}
+.service-ico.teal{background:var(--teal-light)}
+.service-ico.dark{background:rgba(13,13,13,.06)}
+.service-info{flex:1}
+.service-name{font-size:.875rem;font-weight:600;color:var(--black)}
+.service-sub{font-size:.75rem;color:var(--text-muted)}
+.check-ico{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.check-ico svg{width:10px;height:10px;stroke:#fff;stroke-width:2.5;fill:none}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:1.25rem;border-top:1px solid var(--border);
+}
+.card-footer-txt{font-size:.75rem;color:var(--text-muted)}
+.card-footer-txt b{color:var(--black);font-weight:600}
+.card-btn{
+  background:var(--orange);color:#fff;
+  border:none;padding:.55rem 1.25rem;border-radius:100px;
+  font-family:var(--sans);font-size:.8125rem;font-weight:600;
+  cursor:pointer;transition:opacity .2s;
+}
+.card-btn:hover{opacity:.85}
 
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.1rem 2rem;
-      background: rgba(247,244,239,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800; font-size: 1.3rem;
-      color: var(--ink);
-      letter-spacing: -0.5px;
-    }
-    .logo span { color: var(--accent); }
-    nav a.cta-nav {
-      background: var(--accent);
-      color: #fff;
-      padding: 0.5rem 1.2rem;
-      border-radius: 50px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    nav a.cta-nav:hover { opacity: 0.85; }
+/* floating badge */
+.float-badge{
+  position:absolute;top:-20px;right:-20px;
+  background:var(--black);color:#fff;
+  border-radius:16px;padding:.875rem 1.125rem;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  display:flex;align-items:center;gap:.75rem;
+  white-space:nowrap;
+}
+.float-badge-ico{font-size:1.25rem}
+.float-badge-txt{font-size:.8rem}
+.float-badge-txt b{display:block;font-size:1rem;font-weight:700;color:#fff}
+.float-badge-txt span{color:rgba(255,255,255,.5);font-size:.7rem}
 
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex; align-items: center;
-      padding: 7rem 2rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-bg {
-      position: absolute; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse 70% 60% at 80% 40%, rgba(46,196,182,0.12) 0%, transparent 70%),
-                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(255,107,53,0.08) 0%, transparent 60%);
-    }
-    .hero-inner {
-      position: relative; z-index: 1;
-      max-width: 700px;
-    }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--accent);
-      background: rgba(255,107,53,0.1);
-      padding: 0.35rem 0.9rem; border-radius: 50px;
-      margin-bottom: 1.5rem;
-    }
-    .eyebrow::before { content: '●'; font-size: 0.5rem; }
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      margin-bottom: 1.5rem;
-      color: var(--ink);
-    }
-    h1 em {
-      font-style: normal;
-      color: var(--accent);
-    }
-    .hero p {
-      font-size: 1.125rem;
-      color: var(--muted);
-      max-width: 520px;
-      margin-bottom: 2.5rem;
-    }
-    .hero-cta {
-      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      padding: 0.9rem 2rem;
-      border-radius: 50px;
-      font-weight: 600; font-size: 1rem;
-      text-decoration: none;
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(255,107,53,0.3);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,53,0.4); }
-    .reassurance {
-      font-size: 0.875rem; color: var(--muted);
-      display: flex; align-items: center; gap: 0.4rem;
-    }
-    .reassurance::before { content: '✓'; color: var(--accent2); font-weight: 700; }
+.float-badge2{
+  position:absolute;bottom:-20px;left:-30px;
+  background:#fff;border:1px solid var(--border);
+  border-radius:16px;padding:.75rem 1rem;
+  box-shadow:0 8px 24px rgba(0,0,0,.07);
+  display:flex;align-items:center;gap:.625rem;
+}
+.float-badge2 .num{font-family:var(--serif);font-size:1.5rem;color:var(--orange);line-height:1}
+.float-badge2 .lbl{font-size:.7rem;color:var(--text-muted);max-width:60px;line-height:1.3}
 
-    /* STATS */
-    .stats {
-      display: flex; flex-wrap: wrap; gap: 2rem;
-      padding: 2.5rem 2rem;
-      background: var(--ink);
-      color: #fff;
-    }
-    .stat {
-      flex: 1; min-width: 140px;
-      display: flex; flex-direction: column; align-items: center; text-align: center;
-      padding: 0.5rem;
-    }
-    .stat-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 2.2rem; font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .stat-label {
-      font-size: 0.85rem; color: rgba(255,255,255,0.6);
-      margin-top: 0.3rem;
-    }
+/* ── MARQUEE ── */
+.marquee-wrap{
+  overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:.875rem 0;background:var(--off);
+}
+.marquee-track{display:flex;gap:3rem;width:max-content;animation:marquee 20s linear infinite}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{
+  display:flex;align-items:center;gap:.6rem;
+  font-size:.8125rem;font-weight:500;color:var(--text-muted);
+  white-space:nowrap;
+}
+.marquee-item .dot{color:var(--orange)}
 
-    /* SERVICES */
-    section { padding: 5rem 2rem; }
-    .section-label {
-      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent2);
-      margin-bottom: 0.75rem;
-    }
-    h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 800; letter-spacing: -0.8px;
-      margin-bottom: 0.75rem;
-    }
-    .section-sub {
-      color: var(--muted); font-size: 1rem;
-      max-width: 480px; margin-bottom: 3rem;
-    }
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.25rem;
-      max-width: 1000px;
-    }
-    .service-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.75rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
-    .service-icon {
-      font-size: 2rem; margin-bottom: 1rem;
-      display: inline-block;
-    }
-    .service-card h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.05rem; font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
-    .service-card p {
-      font-size: 0.875rem; color: var(--muted);
-      line-height: 1.55;
-    }
+/* ── SERVICES ── */
+.section{padding:7rem 3rem}
+.section-eyebrow{
+  font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--orange);margin-bottom:1rem;
+}
+h2{
+  font-family:var(--serif);
+  font-size:clamp(2rem,4vw,3rem);
+  font-weight:400;letter-spacing:-.5px;line-height:1.1;
+  margin-bottom:1rem;
+}
+.section-sub{color:var(--text-muted);font-size:1rem;font-weight:300;max-width:480px;line-height:1.75;margin-bottom:3.5rem}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.srv{
+  border:1px solid var(--border);border-radius:20px;
+  padding:2rem;background:#fff;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.srv:hover{transform:translateY(-6px);border-color:var(--orange);box-shadow:0 16px 40px rgba(232,84,26,.08)}
+.srv-ico{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.375rem;
+}
+.srv h3{font-size:1rem;font-weight:600;line-height:1.3}
+.srv p{font-size:.875rem;color:var(--text-muted);line-height:1.65;flex:1}
+.srv-tag{
+  display:inline-block;align-self:flex-start;
+  font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.3rem .75rem;border-radius:100px;
+}
+.srv-tag.fast{background:var(--teal-light);color:var(--teal)}
+.srv-tag.pop{background:var(--orange-light);color:var(--orange)}
+.srv-tag.free{background:rgba(13,13,13,.06);color:var(--text-muted)}
 
-    /* HOW IT WORKS */
-    .how { background: var(--ink); color: #fff; }
-    .how h2 { color: #fff; }
-    .how .section-sub { color: rgba(255,255,255,0.5); }
-    .steps {
-      display: flex; flex-wrap: wrap; gap: 0;
-      max-width: 900px;
-      position: relative;
-    }
-    .step {
-      flex: 1; min-width: 200px;
-      padding: 2rem 1.5rem;
-      position: relative;
-    }
-    .step:not(:last-child)::after {
-      content: '→';
-      position: absolute; right: -0.5rem; top: 2.2rem;
-      color: var(--accent); font-size: 1.2rem;
-      display: none;
-    }
-    @media(min-width: 600px) { .step:not(:last-child)::after { display: block; } }
-    .step-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 3rem; font-weight: 800;
-      color: var(--accent); opacity: 0.25;
-      line-height: 1; margin-bottom: 0.75rem;
-    }
-    .step h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      color: #fff; margin-bottom: 0.4rem;
-    }
-    .step p { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+/* ── HOW ── */
+.how-section{padding:7rem 3rem;background:var(--black);color:#fff}
+.how-section .section-eyebrow{color:var(--orange)}
+.how-section h2{color:#fff}
+.how-section .section-sub{color:rgba(255,255,255,.4)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin-top:3rem}
+.steps::before{
+  content:'';position:absolute;top:28px;left:calc(12.5%);right:calc(12.5%);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),rgba(255,255,255,.12),transparent);
+}
+.step{padding:0 1.5rem;position:relative}
+.step-num{
+  width:56px;height:56px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:1.25rem;color:rgba(255,255,255,.3);
+  margin-bottom:1.5rem;background:var(--black);position:relative;z-index:1;
+}
+.step.active .step-num{background:var(--orange);border-color:var(--orange);color:#fff}
+.step h3{font-size:.9375rem;font-weight:600;color:#fff;margin-bottom:.5rem}
+.step p{font-size:.8125rem;color:rgba(255,255,255,.4);line-height:1.65}
 
-    /* FORM */
-    .form-section {
-      background: var(--cream);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .form-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
-      max-width: 520px; width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.06);
-    }
-    .form-card h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-    .form-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
-    .field { margin-bottom: 1.25rem; }
-    label {
-      display: block;
-      font-size: 0.8rem; font-weight: 600;
-      letter-spacing: 0.04em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 0.4rem;
-    }
-    input, select, textarea {
-      width: 100%; padding: 0.85rem 1rem;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
-      background: #fff;
-      color: var(--ink);
-      transition: border-color 0.2s;
-      outline: none;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
-    }
-    textarea { resize: vertical; min-height: 100px; }
-    .services-check {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 0.6rem; margin-top: 0.5rem;
-    }
-    .check-item {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.875rem; cursor: pointer;
-    }
-    .check-item input[type="checkbox"] {
-      width: 16px; height: 16px;
-      accent-color: var(--accent);
-      cursor: pointer;
-      padding: 0;
-    }
-    .btn-submit {
-      width: 100%; margin-top: 1.5rem;
-      padding: 1rem;
-      background: var(--accent);
-      color: #fff;
-      border: none; border-radius: 50px;
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(255,107,53,0.3);
-    }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,53,0.4); }
-    .form-note {
-      text-align: center; font-size: 0.8rem;
-      color: var(--muted); margin-top: 1rem;
-    }
+/* ── STATS ── */
+.stats-section{padding:7rem 3rem;background:var(--off)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:3rem}
+.stat{
+  background:#fff;border:1px solid var(--border);border-radius:20px;
+  padding:2rem;
+}
+.stat-num{
+  font-family:var(--serif);
+  font-size:3rem;font-weight:400;line-height:1;
+  color:var(--black);margin-bottom:.5rem;
+}
+.stat-num span{color:var(--orange)}
+.stat-desc{font-size:.875rem;color:var(--text-muted);line-height:1.5}
 
-    /* SUCCESS */
-    .success-msg {
-      display: none;
-      text-align: center; padding: 2rem;
-    }
-    .success-msg .icon { font-size: 3rem; margin-bottom: 1rem; }
-    .success-msg h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.4rem; font-weight: 800;
-      margin-bottom: 0.5rem;
-    }
-    .success-msg p { color: var(--muted); font-size: 0.9rem; }
+/* ── FORM ── */
+.form-section{padding:7rem 3rem;display:flex;gap:5rem;align-items:flex-start}
+.form-left{flex:1}
+.form-left h2{margin-bottom:1rem}
+.form-left .section-sub{margin-bottom:2rem}
+.perks{display:flex;flex-direction:column;gap:1rem}
+.perk{display:flex;align-items:flex-start;gap:.875rem}
+.perk-ico{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--orange-light);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;margin-top:2px;
+}
+.perk-txt{font-size:.875rem;color:var(--text-muted);line-height:1.6}
+.perk-txt b{display:block;font-size:.9375rem;color:var(--black);font-weight:600;margin-bottom:.15rem}
 
-    /* FOOTER */
-    footer {
-      background: var(--ink); color: rgba(255,255,255,0.4);
-      text-align: center; padding: 2rem;
-      font-size: 0.8rem;
-    }
-    footer span { color: var(--accent); }
+.form-right{flex:1}
+.form-card{
+  background:#fff;border:1px solid var(--border);border-radius:24px;
+  padding:2.5rem;box-shadow:0 24px 64px rgba(0,0,0,.06);
+}
+.form-card h3{font-family:var(--serif);font-size:1.75rem;font-weight:400;margin-bottom:.5rem}
+.form-card .sub{font-size:.875rem;color:var(--text-muted);margin-bottom:2rem}
+.field{margin-bottom:1.25rem}
+.field label{
+  display:block;font-size:.7rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem;
+}
+.field input,.field select,.field textarea{
+  width:100%;padding:.875rem 1rem;
+  border:1.5px solid var(--border);border-radius:12px;
+  font-family:var(--sans);font-size:.9375rem;color:var(--black);
+  background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;
+  appearance:none;-webkit-appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--orange);
+  box-shadow:0 0 0 4px rgba(232,84,26,.08);
+}
+.field textarea{resize:vertical;min-height:90px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;margin-top:.5rem}
+.chk{
+  display:flex;align-items:center;gap:.625rem;
+  border:1.5px solid var(--border);border-radius:10px;
+  padding:.625rem .875rem;cursor:pointer;
+  transition:border-color .2s,background .2s;font-size:.875rem;
+}
+.chk:hover{border-color:var(--orange);background:var(--orange-light)}
+.chk input{display:none}
+.chk.selected{border-color:var(--orange);background:var(--orange-light);color:var(--orange);font-weight:600}
+.chk-ico{font-size:.875rem}
+.btn-submit{
+  width:100%;margin-top:1.5rem;
+  padding:1.0625rem;
+  background:var(--orange);color:#fff;border:none;
+  border-radius:100px;font-family:var(--sans);
+  font-size:1rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.75rem;
+  transition:transform .25s,box-shadow .25s;
+  box-shadow:0 4px 24px rgba(232,84,26,.25);
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(232,84,26,.35)}
+.form-note{text-align:center;font-size:.75rem;color:var(--text-muted);margin-top:1rem}
 
-    @media (max-width: 600px) {
-      nav { padding: 1rem; }
-      .hero { padding: 6rem 1.25rem 3rem; }
-      section { padding: 3.5rem 1.25rem; }
-      .form-card { padding: 2rem 1.25rem; border-radius: 16px; }
-      .services-check { grid-template-columns: 1fr; }
-    }
-  </style>
+/* success */
+.success{display:none;text-align:center;padding:2rem}
+.success-ico{font-size:3rem;margin-bottom:1rem}
+.success h3{font-family:var(--serif);font-size:2rem;font-weight:400;margin-bottom:.5rem}
+.success p{font-size:.9rem;color:var(--text-muted)}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--black);color:rgba(255,255,255,.35);
+  padding:2.5rem 3rem;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.8125rem;
+}
+footer .logo{color:#fff;font-size:1.25rem}
+footer a{color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+footer a:hover{color:#fff}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:1rem 1.25rem}
+  .nav-links{display:none}
+  .hero{grid-template-columns:1fr;padding:7rem 1.5rem 3rem;gap:3rem}
+  .hero-right{display:none}
+  .section,.how-section,.stats-section,.form-section{padding:4rem 1.5rem}
+  .services-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr;gap:2rem}
+  .steps::before{display:none}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-section{flex-direction:column;gap:3rem}
+  .row2{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:1rem;text-align:center}
+}
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="logo">Nido<span>Sync</span></div>
-    <a href="#contact" class="cta-nav">Être rappelé →</a>
-  </nav>
+<!-- NAV -->
+<nav>
+  <div class="logo">Nido<b>Sync</b></div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#comment">Comment ça marche</a>
+    <a href="#contact" class="nav-cta">Être rappelé</a>
+  </div>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero" id="home">
-    <div class="hero-bg"></div>
-    <div class="hero-inner">
-      <div class="eyebrow">Conciergerie post-déménagement</div>
-      <h1>Vous venez d'emménager.<br /><em>On s'occupe du reste.</em></h1>
-      <p>Artisans, box internet, électricité, changement de serrure — tout ce qu'il faut pour être vraiment chez vous, sans passer des heures à chercher.</p>
-      <div class="hero-cta">
-        <a href="#contact" class="btn-primary">Je veux être rappelé gratuitement →</a>
-        <span class="reassurance">Réponse sous 2h</span>
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-tag"><span></span> Conciergerie post-déménagement</div>
+    <h1>Vous venez<br/>d'emménager.<br/><i>On s'occupe<br/>du reste.</i></h1>
+    <p class="hero-desc">Artisans, box internet, énergie, changement de serrure — tout ce qu'il faut pour être vraiment chez vous, sans passer vos soirées à chercher.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-main">
+        Être rappelé gratuitement
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+      <div class="trust">
+        <div class="trust-dots">
+          <div class="trust-dot">ML</div>
+          <div class="trust-dot">SR</div>
+          <div class="trust-dot">AT</div>
+        </div>
+        <span>Réponse sous 2h · Gratuit pour vous</span>
       </div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num">14h</div>
-      <div class="stat-label">perdues en moyenne après un déménagement</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">8+</div>
-      <div class="stat-label">démarches à gérer seul</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">24h</div>
-      <div class="stat-label">pour tout organiser avec NidoSync</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">0€</div>
-      <div class="stat-label">de frais pour vous</div>
     </div>
   </div>
 
-  <!-- SERVICES -->
-  <section id="services">
-    <div class="section-label">Ce qu'on gère pour vous</div>
-    <h2>Tout ce dont vous avez besoin<br />au bon moment</h2>
-    <p class="section-sub">On contacte les prestataires à votre place et on coordonne tout. Vous n'avez qu'un seul interlocuteur.</p>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon">🔧</div>
-        <h3>Artisans de confiance</h3>
-        <p>Électricien, plombier, peintre, serrurier — des pros vérifiés dans votre nouvelle ville, disponibles rapidement.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">📡</div>
-        <h3>Box & téléphone</h3>
-        <p>Transfert ou nouvelle souscription chez Free, Orange, SFR, Bouygues. On compare les offres et on gère le rendez-vous technicien.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">⚡</div>
-        <h3>Énergie</h3>
-        <p>Ouverture de contrat EDF, Engie, Total Énergie ou autre. Mise en service garantie pour votre date d'entrée.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">🔐</div>
-        <h3>Changement de serrure</h3>
-        <p>Intervention d'un serrurier certifié dans les 48h. Parce qu'on ne sait jamais combien d'anciens locataires ont les clés.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">📦</div>
-        <h3>Stockage temporaire</h3>
-        <p>Besoin de garder des affaires quelques semaines ? On vous trouve un box sécurisé à deux pas de chez vous.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">🏠</div>
-        <h3>Et bien plus encore</h3>
-        <p>Assurance habitation, nettoyage, peinture, montage de meubles... Dites-nous ce dont vous avez besoin.</p>
+  <div class="hero-right">
+    <div class="float-badge">
+      <div class="float-badge-ico">⚡</div>
+      <div class="float-badge-txt">
+        <b>2h</b>
+        <span>délai de réponse garanti</span>
       </div>
     </div>
-  </section>
 
-  <!-- HOW IT WORKS -->
-  <section class="how" id="how">
-    <div class="section-label" style="color:var(--accent2)">Comment ça marche</div>
-    <h2>Simple comme un appel</h2>
-    <p class="section-sub">Pas d'application à installer, pas de formulaire interminable. On fait le travail pour vous.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <h3>Vous remplissez le formulaire</h3>
-        <p>2 minutes. Votre adresse, vos besoins, votre date d'emménagement.</p>
+    <div class="hero-card">
+      <div class="card-head">
+        <span class="card-title">Votre checklist</span>
+        <span class="status-pill"><span class="status-dot"></span> En cours</span>
       </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <h3>On vous rappelle sous 2h</h3>
-        <p>Un conseiller dédié fait le point avec vous et prend tout en charge.</p>
+      <div class="service-list">
+        <div class="service-row">
+          <div class="service-ico orange">🔧</div>
+          <div class="service-info">
+            <div class="service-name">Plombier</div>
+            <div class="service-sub">RDV confirmé — Mardi 10h</div>
+          </div>
+          <div class="check-ico"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+        </div>
+        <div class="service-row">
+          <div class="service-ico teal">📡</div>
+          <div class="service-info">
+            <div class="service-name">Box Fibre Orange</div>
+            <div class="service-sub">Installation Jeudi 14h–18h</div>
+          </div>
+          <div class="check-ico"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+        </div>
+        <div class="service-row">
+          <div class="service-ico dark">⚡</div>
+          <div class="service-info">
+            <div class="service-name">Contrat EDF</div>
+            <div class="service-sub">Activation demain matin</div>
+          </div>
+          <div class="check-ico" style="background:var(--off)">
+            <svg viewBox="0 0 12 12" stroke="var(--text-muted)"><polyline points="2,6 5,9 10,3"/></svg>
+          </div>
+        </div>
+        <div class="service-row">
+          <div class="service-ico dark">🔐</div>
+          <div class="service-info">
+            <div class="service-name">Changement serrure</div>
+            <div class="service-sub">Serrurier en attente confirmation</div>
+          </div>
+          <div class="check-ico" style="background:var(--off)">
+            <svg viewBox="0 0 12 12" stroke="var(--text-muted)"><polyline points="2,6 5,9 10,3"/></svg>
+          </div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <h3>On coordonne tout</h3>
-        <p>Rendez-vous, devis, confirmations — vous recevez juste un récap.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <h3>Vous profitez de votre nouveau chez-vous</h3>
-        <p>Sans stress, sans recherche, sans attente.</p>
+      <div class="card-footer">
+        <div class="card-footer-txt">2 sur 4 confirmés<br/><b>Tout sera prêt vendredi</b></div>
+        <button class="card-btn">Voir détails</button>
       </div>
     </div>
-  </section>
 
-  <!-- FORM -->
-  <section class="form-section" id="contact">
+    <div class="float-badge2">
+      <div class="num">0€</div>
+      <div class="lbl">de frais pour vous</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="dot">●</span> Artisans vérifiés</div>
+    <div class="marquee-item"><span class="dot">●</span> Réponse sous 2h</div>
+    <div class="marquee-item"><span class="dot">●</span> Box internet</div>
+    <div class="marquee-item"><span class="dot">●</span> Contrat énergie</div>
+    <div class="marquee-item"><span class="dot">●</span> Changement de serrure</div>
+    <div class="marquee-item"><span class="dot">●</span> Stockage temporaire</div>
+    <div class="marquee-item"><span class="dot">●</span> 100% gratuit pour vous</div>
+    <div class="marquee-item"><span class="dot">●</span> Artisans vérifiés</div>
+    <div class="marquee-item"><span class="dot">●</span> Réponse sous 2h</div>
+    <div class="marquee-item"><span class="dot">●</span> Box internet</div>
+    <div class="marquee-item"><span class="dot">●</span> Contrat énergie</div>
+    <div class="marquee-item"><span class="dot">●</span> Changement de serrure</div>
+    <div class="marquee-item"><span class="dot">●</span> Stockage temporaire</div>
+    <div class="marquee-item"><span class="dot">●</span> 100% gratuit pour vous</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-eyebrow">Ce qu'on gère pour vous</div>
+  <h2>Tout ce dont vous avez<br/>besoin au bon moment</h2>
+  <p class="section-sub">Un seul appel. Un interlocuteur dédié. On contacte les prestataires, on coordonne les rendez-vous, vous n'avez qu'à ouvrir la porte.</p>
+  <div class="services-grid">
+    <div class="srv">
+      <div class="srv-ico orange">🔧</div>
+      <h3>Artisans de confiance</h3>
+      <p>Électricien, plombier, peintre, serrurier — des pros vérifiés dans votre nouvelle ville, disponibles rapidement.</p>
+      <span class="srv-tag fast">Dispo sous 48h</span>
+    </div>
+    <div class="srv">
+      <div class="srv-ico teal">📡</div>
+      <h3>Box & téléphone</h3>
+      <p>Transfert ou nouvelle souscription chez Free, Orange, SFR, Bouygues. On compare les offres et on gère le rendez-vous technicien.</p>
+      <span class="srv-tag pop">Le + demandé</span>
+    </div>
+    <div class="srv">
+      <div class="srv-ico dark">⚡</div>
+      <h3>Énergie</h3>
+      <p>Ouverture de contrat EDF, Engie, Total Énergie. Mise en service garantie pour votre date d'entrée.</p>
+      <span class="srv-tag fast">Activation J+1</span>
+    </div>
+    <div class="srv">
+      <div class="srv-ico dark">🔐</div>
+      <h3>Changement de serrure</h3>
+      <p>Intervention d'un serrurier certifié dans les 48h. Parce qu'on ne sait jamais qui a les anciennes clés.</p>
+      <span class="srv-tag free">Recommandé</span>
+    </div>
+    <div class="srv">
+      <div class="srv-ico orange">📦</div>
+      <h3>Stockage temporaire</h3>
+      <p>Besoin de garder des affaires quelques semaines ? On vous trouve un box sécurisé à deux pas de chez vous.</p>
+      <span class="srv-tag free">Sur demande</span>
+    </div>
+    <div class="srv" style="border-style:dashed">
+      <div class="srv-ico dark">✨</div>
+      <h3>Et bien plus encore</h3>
+      <p>Assurance habitation, nettoyage, montage de meubles, peinture... Dites-nous ce dont vous avez besoin, on s'en occupe.</p>
+      <span class="srv-tag free">Sur mesure</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how-section" id="comment">
+  <div class="section-eyebrow">Comment ça marche</div>
+  <h2>Simple comme un appel</h2>
+  <p class="section-sub">Pas d'application à installer, pas de formulaire interminable. On fait le travail pour vous.</p>
+  <div class="steps">
+    <div class="step active">
+      <div class="step-num">1</div>
+      <h3>Vous remplissez le formulaire</h3>
+      <p>2 minutes. Votre adresse, vos besoins, votre date d'emménagement.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>On vous rappelle sous 2h</h3>
+      <p>Un conseiller dédié fait le point avec vous et prend tout en charge.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>On coordonne tout</h3>
+      <p>Rendez-vous, devis, confirmations — vous recevez juste un récap clair.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Vous profitez de chez vous</h3>
+      <p>Sans stress, sans recherche, sans attente. Bienvenue chez vous.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="section-eyebrow">En chiffres</div>
+  <h2>Pourquoi NidoSync ?</h2>
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-num"><span>14</span>h</div>
+      <div class="stat-desc">perdues en moyenne par les Français après un déménagement</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><span>8</span>+</div>
+      <div class="stat-desc">démarches à gérer seul après un emménagement</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><span>2</span>h</div>
+      <div class="stat-desc">délai de réponse garanti par notre équipe</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><span>0</span>€</div>
+      <div class="stat-desc">de frais pour vous — nos partenaires nous rémunèrent</div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section" id="contact">
+  <div class="form-left">
+    <div class="section-eyebrow">Contact</div>
+    <h2>On prend en charge votre emménagement</h2>
+    <p class="section-sub">Laissez-nous vos coordonnées. Un conseiller vous rappelle dans les 2h ouvrées pour faire le point sur vos besoins.</p>
+    <div class="perks">
+      <div class="perk">
+        <div class="perk-ico">🎯</div>
+        <div class="perk-txt"><b>Service 100% gratuit</b>Nos partenaires nous rémunèrent à la commission — aucun frais pour vous.</div>
+      </div>
+      <div class="perk">
+        <div class="perk-ico">⚡</div>
+        <div class="perk-txt"><b>Réponse sous 2h ouvrées</b>Un conseiller dédié vous rappelle rapidement pour cadrer vos besoins.</div>
+      </div>
+      <div class="perk">
+        <div class="perk-ico">🔒</div>
+        <div class="perk-txt"><b>Vos données sont confidentielles</b>Aucun démarchage commercial, aucune revente de données.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-right">
     <div class="form-card">
-      <div id="form-content">
-        <h2>On vous rappelle<br />gratuitement</h2>
-        <p>Laissez-nous vos coordonnées, un conseiller vous contacte sous 2h ouvrées.</p>
+      <div id="form-body">
+        <h3>Être rappelé gratuitement</h3>
+        <p class="sub">Remplissez ce formulaire, on s'occupe du reste.</p>
 
-        <div class="field">
-          <label>Prénom & Nom</label>
-          <input type="text" id="name" placeholder="Marie Dupont" />
-        </div>
-        <div class="field">
-          <label>Téléphone</label>
-          <input type="tel" id="phone" placeholder="06 12 34 56 78" />
-        </div>
-        <div class="field">
-          <label>Ville d'arrivée</label>
-          <input type="text" id="city" placeholder="Paris, Lyon, Marseille..." />
-        </div>
-        <div class="field">
-          <label>Date d'emménagement</label>
-          <input type="date" id="date" />
-        </div>
-        <div class="field">
-          <label>Ce dont j'ai besoin</label>
-          <div class="services-check">
-            <label class="check-item"><input type="checkbox" value="artisans" /> Artisans</label>
-            <label class="check-item"><input type="checkbox" value="internet" /> Box internet</label>
-            <label class="check-item"><input type="checkbox" value="energie" /> Énergie</label>
-            <label class="check-item"><input type="checkbox" value="serrure" /> Serrure</label>
-            <label class="check-item"><input type="checkbox" value="stockage" /> Stockage</label>
-            <label class="check-item"><input type="checkbox" value="autre" /> Autre</label>
+        <div class="row2">
+          <div class="field">
+            <label>Prénom</label>
+            <input type="text" id="prenom" placeholder="Marie"/>
+          </div>
+          <div class="field">
+            <label>Nom</label>
+            <input type="text" id="nom" placeholder="Dupont"/>
           </div>
         </div>
         <div class="field">
-          <label>Message (optionnel)</label>
-          <textarea id="message" placeholder="Précisez vos besoins si nécessaire..."></textarea>
+          <label>Téléphone</label>
+          <input type="tel" id="phone" placeholder="06 12 34 56 78"/>
         </div>
-        <button class="btn-submit" onclick="handleSubmit()">Je veux être rappelé gratuitement →</button>
-        <p class="form-note">🔒 Vos données restent confidentielles. Aucun démarchage commercial.</p>
+        <div class="row2">
+          <div class="field">
+            <label>Ville d'arrivée</label>
+            <input type="text" id="ville" placeholder="Paris, Lyon..."/>
+          </div>
+          <div class="field">
+            <label>Date d'emménagement</label>
+            <input type="date" id="date"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Ce dont j'ai besoin</label>
+          <div class="checks">
+            <div class="chk" onclick="toggle(this)"><input type="checkbox"/><span class="chk-ico">🔧</span> Artisans</div>
+            <div class="chk" onclick="toggle(this)"><input type="checkbox"/><span class="chk-ico">📡</span> Box internet</div>
+            <div class="chk" onclick="toggle(this)"><input type="checkbox"/><span class="chk-ico">⚡</span> Énergie</div>
+            <div class="chk" onclick="toggle(this)"><input type="checkbox"/><span class="chk-ico">🔐</span> Serrure</div>
+            <div class="chk" onclick="toggle(this)"><input type="checkbox"/><span class="chk-ico">📦</span> Stockage</div>
+            <div class="chk" onclick="toggle(this)"><input type="checkbox"/><span class="chk-ico">✨</span> Autre</div>
+          </div>
+        </div>
+        <button class="btn-submit" onclick="submit()">
+          Je veux être rappelé gratuitement
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+        <p class="form-note">🔒 Données confidentielles · Aucun démarchage</p>
       </div>
-
-      <div class="success-msg" id="success">
-        <div class="icon">✅</div>
+      <div class="success" id="success-msg">
+        <div class="success-ico">🏠</div>
         <h3>C'est noté !</h3>
-        <p>On vous rappelle dans les 2h ouvrées.<br />Bienvenue dans votre nouveau chez-vous 🏠</p>
+        <p>On vous rappelle dans les 2h ouvrées.<br/>Bienvenue dans votre nouveau chez-vous.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 <span>NidoSync</span> — La conciergerie du déménagement · Paris, France</p>
-  </footer>
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Nido<b>Sync</b></div>
+  <span>© 2026 NidoSync · Paris, France</span>
+  <div style="display:flex;gap:2rem">
+    <a href="#">Confidentialité</a>
+    <a href="#">Mentions légales</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
 
-  <script>
-    function handleSubmit() {
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const city = document.getElementById('city').value.trim();
-
-      if (!name || !phone || !city) {
-        alert('Merci de remplir au minimum votre nom, téléphone et ville d\'arrivée.');
-        return;
-      }
-
-      document.getElementById('form-content').style.display = 'none';
-      document.getElementById('success').style.display = 'block';
-    }
-
-    // Set min date to today
-    const dateInput = document.getElementById('date');
-    if (dateInput) {
-      dateInput.min = new Date().toISOString().split('T')[0];
-    }
-  </script>
+<script>
+function toggle(el){
+  el.classList.toggle('selected');
+  el.querySelector('input').checked=el.classList.contains('selected');
+}
+function submit(){
+  const p=document.getElementById('prenom').value.trim();
+  const ph=document.getElementById('phone').value.trim();
+  const v=document.getElementById('ville').value.trim();
+  if(!p||!ph||!v){alert('Merci de renseigner au minimum votre prénom, téléphone et ville.');return;}
+  document.getElementById('form-body').style.display='none';
+  document.getElementById('success-msg').style.display='block';
+}
+document.getElementById('date').min=new Date().toISOString().split('T')[0];
+</script>
 </body>
 </html>
