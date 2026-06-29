@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NidoSync — Suivi GPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#111110;--white:#FAFAF8;--off:#F3F1EC;
+  --orange:#E05A1A;--orange-dim:#FEF0E8;
+  --teal:#17907A;--teal-dim:#E2F5F0;
+  --muted:#82807A;--border:#E4E1DA;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--white);color:var(--black);overflow:hidden}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(250,250,248,.92);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:58px;
+}
+.logo{font-family:var(--serif);font-size:1.3rem;color:var(--black)}
+.logo em{color:var(--orange);font-style:italic}
+.view-toggle{display:flex;background:var(--off);border-radius:100px;padding:4px;gap:2px}
+.vt-btn{
+  padding:.4rem 1.1rem;border-radius:100px;border:none;
+  font-family:var(--sans);font-size:.8125rem;font-weight:500;
+  cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;
+}
+.vt-btn.active{background:#fff;color:var(--black);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.demo-badge{background:var(--orange-dim);color:var(--orange);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .75rem;border-radius:100px}
+
+/* LAYOUT */
+.app{display:flex;height:100vh;padding-top:58px}
+
+/* SIDEBAR */
+.sidebar{
+  width:360px;flex-shrink:0;
+  background:#fff;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  z-index:10;
+}
+.sb-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-title{font-size:.875rem;font-weight:600;color:var(--black);margin-bottom:.25rem}
+.sb-sub{font-size:.75rem;color:var(--muted)}
+.sb-scroll{flex:1;overflow-y:auto;padding:.75rem}
+
+/* CLIENT VIEW */
+.client-view{display:flex;flex-direction:column;gap:0}
+
+/* ETA CARD */
+.eta-card{
+  background:var(--black);border-radius:16px;padding:1.5rem;margin-bottom:.75rem;
+}
+.eta-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.5rem}
+.eta-time{font-family:var(--serif);font-size:2.75rem;color:#fff;line-height:1;margin-bottom:.25rem}
+.eta-desc{font-size:.8125rem;color:rgba(255,255,255,.45)}
+.eta-status{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:var(--teal);color:#fff;
+  font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.35rem .875rem;border-radius:100px;margin-top:1rem;
+}
+.eta-dot{width:6px;height:6px;background:#fff;border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TIMELINE */
+.timeline{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:.75rem}
+.tl-head{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:.8125rem;font-weight:600}
+.tl-item{display:flex;gap:.875rem;padding:.875rem 1.25rem;position:relative}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:calc(1.25rem + 11px);top:calc(.875rem + 22px);bottom:0;width:1px;background:var(--border)}
+.tl-ico{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;
+}
+.tl-ico.done{background:var(--teal);color:#fff}
+.tl-ico.active{background:var(--orange);color:#fff;animation:pulse-ico 2s infinite}
+@keyframes pulse-ico{0%,100%{box-shadow:0 0 0 0 rgba(224,90,26,.4)}50%{box-shadow:0 0 0 6px rgba(224,90,26,0)}}
+.tl-ico.todo{background:var(--off);color:var(--muted)}
+.tl-info{flex:1}
+.tl-name{font-size:.875rem;font-weight:600;color:var(--black)}
+.tl-time{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+/* TRUCK INFO */
+.truck-info{background:var(--off);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:.875rem}
+.truck-ico{font-size:1.5rem}
+.truck-txt{}
+.truck-name{font-size:.875rem;font-weight:600;margin-bottom:.15rem}
+.truck-detail{font-size:.75rem;color:var(--muted)}
+
+/* FLEET VIEW */
+.fleet-view{display:none;flex-direction:column;gap:.75rem}
+.fleet-head{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0}
+.fleet-title{font-size:.875rem;font-weight:600}
+.fleet-badge{font-size:.75rem;color:var(--teal);background:var(--teal-dim);padding:.25rem .625rem;border-radius:100px;font-weight:600}
+.truck-card{
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;
+}
+.truck-card:hover,.truck-card.selected{border-color:var(--orange);box-shadow:0 2px 12px rgba(224,90,26,.1)}
+.tc-head{padding:.875rem 1rem;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid var(--border)}
+.tc-ico{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--off);display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.tc-name{font-size:.875rem;font-weight:600;flex:1}
+.tc-status{
+  font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.25rem .625rem;border-radius:100px;
+}
+.tc-status.en-route{background:var(--teal-dim);color:var(--teal)}
+.tc-status.chargement{background:var(--orange-dim);color:var(--orange)}
+.tc-status.pause{background:var(--off);color:var(--muted)}
+.tc-body{padding:.875rem 1rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.tc-stat{}
+.tc-stat-val{font-size:.9375rem;font-weight:600;color:var(--black)}
+.tc-stat-lbl{font-size:.7rem;color:var(--muted)}
+.tc-progress{padding:.75rem 1rem;border-top:1px solid var(--border)}
+.tc-prog-bar{height:4px;background:var(--off);border-radius:100px;overflow:hidden;margin-top:.375rem}
+.tc-prog-fill{height:100%;background:var(--teal);border-radius:100px;transition:width 1s}
+
+/* MAP */
+.map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%}
+.map-overlay{
+  position:absolute;bottom:1.5rem;right:1.5rem;z-index:500;
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  padding:1rem 1.25rem;box-shadow:0 8px 24px rgba(0,0,0,.1);
+  min-width:180px;
+}
+.mo-label{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.mo-speed{font-family:var(--serif);font-size:1.75rem;color:var(--black);line-height:1}
+.mo-speed span{font-size:.875rem;color:var(--muted)}
+.mo-update{font-size:.7rem;color:var(--muted);margin-top:.375rem;display:flex;align-items:center;gap:.375rem}
+.mo-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:blink 1.5s infinite}
+
+/* custom marker */
+.truck-marker{
+  background:var(--orange);border:3px solid #fff;
+  border-radius:50%;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.125rem;box-shadow:0 4px 12px rgba(224,90,26,.4);
+}
+.dest-marker{
+  background:var(--teal);border:3px solid #fff;
+  border-radius:50%;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;box-shadow:0 4px 12px rgba(23,144,122,.3);
+}
+
+@media(max-width:768px){
+  .sidebar{width:100%;max-height:45vh;border-right:none;border-top:1px solid var(--border);order:2}
+  .app{flex-direction:column}
+  .map-wrap{order:1;flex:1}
+  nav{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Nido<em>Sync</em> <span style="font-family:var(--sans);font-size:.8rem;color:var(--muted);font-weight:400"> · Suivi GPS</span></div>
+  <div class="view-toggle">
+    <button class="vt-btn active" onclick="setView('client')">🚚 Client</button>
+    <button class="vt-btn" onclick="setView('fleet')">📊 Flotte</button>
+  </div>
+  <span class="demo-badge">✦ Démo</span>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-title" id="sb-title">Votre déménagement</div>
+      <div class="sb-sub" id="sb-sub">Commande #NS-2847 · Paris → Lyon</div>
+    </div>
+    <div class="sb-scroll">
+
+      <!-- CLIENT VIEW -->
+      <div class="client-view" id="client-view">
+        <div class="eta-card">
+          <div class="eta-label">Arrivée estimée</div>
+          <div class="eta-time" id="eta-time">14h35</div>
+          <div class="eta-desc" id="eta-desc">Dans environ <strong style="color:#fff">47 minutes</strong> · 38 km restants</div>
+          <div class="eta-status"><span class="eta-dot"></span> En route vers vous</div>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-head">Étapes du déménagement</div>
+          <div class="tl-item">
+            <div class="tl-ico done">✓</div>
+            <div class="tl-info">
+              <div class="tl-name">Chargement terminé</div>
+              <div class="tl-time">08h30 · 15 rue Lepic, Paris 18e</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-ico active">🚛</div>
+            <div class="tl-info">
+              <div class="tl-name">En transit</div>
+              <div class="tl-time" id="tl-transit">Depuis 11h42 · A6 direction Lyon</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-ico todo">📦</div>
+            <div class="tl-info">
+              <div class="tl-name">Déchargement</div>
+              <div class="tl-time">Estimé 14h35 · 7 rue de la République, Lyon</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-ico todo">✅</div>
+            <div class="tl-info">
+              <div class="tl-name">Déménagement terminé</div>
+              <div class="tl-time">Estimé 17h00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="truck-info">
+          <div class="truck-ico">🚚</div>
+          <div class="truck-txt">
+            <div class="truck-name">Camion AB-421-CD · 20m³</div>
+            <div class="truck-detail">Chauffeur : Karim M. · 06 12 34 56 78</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLEET VIEW -->
+      <div class="fleet-view" id="fleet-view">
+        <div class="fleet-head">
+          <span class="fleet-title">Camions actifs</span>
+          <span class="fleet-badge">3 en route</span>
+        </div>
+
+        <div class="truck-card selected" onclick="selectTruck(this, 0)">
+          <div class="tc-head">
+            <div class="tc-ico">🚚</div>
+            <div class="tc-name">AB-421-CD</div>
+            <div class="tc-status en-route">En route</div>
+          </div>
+          <div class="tc-body">
+            <div class="tc-stat"><div class="tc-stat-val">87 km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">38 km</div><div class="tc-stat-lbl">Reste</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">14h35</div><div class="tc-stat-lbl">ETA</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">Paris→Lyon</div><div class="tc-stat-lbl">Trajet</div></div>
+          </div>
+          <div class="tc-progress">
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)"><span>Progression</span><span>68%</span></div>
+            <div class="tc-prog-bar"><div class="tc-prog-fill" style="width:68%"></div></div>
+          </div>
+        </div>
+
+        <div class="truck-card" onclick="selectTruck(this, 1)">
+          <div class="tc-head">
+            <div class="tc-ico">🚛</div>
+            <div class="tc-name">EF-892-GH</div>
+            <div class="tc-status chargement">Chargement</div>
+          </div>
+          <div class="tc-body">
+            <div class="tc-stat"><div class="tc-stat-val">0 km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">—</div><div class="tc-stat-lbl">Reste</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">16h00</div><div class="tc-stat-lbl">Départ</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">Paris→Marseille</div><div class="tc-stat-lbl">Trajet</div></div>
+          </div>
+          <div class="tc-progress">
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)"><span>Progression</span><span>12%</span></div>
+            <div class="tc-prog-bar"><div class="tc-prog-fill" style="width:12%"></div></div>
+          </div>
+        </div>
+
+        <div class="truck-card" onclick="selectTruck(this, 2)">
+          <div class="tc-head">
+            <div class="tc-ico">🚐</div>
+            <div class="tc-name">IJ-334-KL</div>
+            <div class="tc-status en-route">En route</div>
+          </div>
+          <div class="tc-body">
+            <div class="tc-stat"><div class="tc-stat-val">112 km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">14 km</div><div class="tc-stat-lbl">Reste</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">13h55</div><div class="tc-stat-lbl">ETA</div></div>
+            <div class="tc-stat"><div class="tc-stat-val">Orléans→Paris</div><div class="tc-stat-lbl">Trajet</div></div>
+          </div>
+          <div class="tc-progress">
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)"><span>Progression</span><span>91%</span></div>
+            <div class="tc-prog-bar"><div class="tc-prog-fill" style="width:91%"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="map-overlay">
+      <div class="mo-label">Vitesse actuelle</div>
+      <div class="mo-speed" id="speed-display">87 <span>km/h</span></div>
+      <div class="mo-update"><span class="mo-dot"></span> Mis à jour il y a 8s</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DONNÉES DÉMO ──
+const TRUCKS = [
+  {
+    id:0, name:'AB-421-CD', emoji:'🚚',
+    // Trajet simulé Paris → Lyon (points intermédiaires A6)
+    route:[
+      [48.8566, 2.3522], // Paris
+      [48.5, 2.6],
+      [47.9, 3.0],
+      [47.3, 3.6],
+      [46.8, 4.2],
+      [46.3, 4.6],
+      [45.9, 4.75],
+      [45.748, 4.847]  // Lyon
+    ],
+    progress:0.68,
+    dest:[45.748, 4.847],
+    destLabel:'Lyon'
+  },
+  {
+    id:1, name:'EF-892-GH', emoji:'🚛',
+    route:[[48.87, 2.35],[48.87, 2.35]],
+    progress:0.12,
+    dest:[43.296, 5.369],
+    destLabel:'Marseille'
+  },
+  {
+    id:2, name:'IJ-334-KL', emoji:'🚐',
+    route:[
+      [47.903, 1.909], // Orléans
+      [48.1, 2.0],
+      [48.4, 2.15],
+      [48.7, 2.28],
+      [48.856, 2.352]  // Paris
+    ],
+    progress:0.91,
+    dest:[48.856, 2.352],
+    destLabel:'Paris'
+  }
+];
+
+let currentTruck = 0;
+let map, truckMarker, destMarker, routeLine;
+let animFrame = 0;
+
+// Init map
+const map_el = L.map('map', {zoomControl:false, attributionControl:false});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {maxZoom:18}).addTo(map_el);
+L.control.zoom({position:'topright'}).addTo(map_el);
+
+function getTruckPos(truck) {
+  const r = truck.route;
+  const prog = Math.min(truck.progress, 0.999);
+  const total = r.length - 1;
+  const idx = Math.floor(prog * total);
+  const frac = (prog * total) - idx;
+  if(idx >= r.length - 1) return r[r.length-1];
+  const a = r[idx], b = r[idx+1];
+  return [a[0] + (b[0]-a[0])*frac, a[1] + (b[1]-a[1])*frac];
+}
+
+function createIcon(html, size) {
+  return L.divIcon({html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2]});
+}
+
+function renderTruck(truckIdx) {
+  const truck = TRUCKS[truckIdx];
+  const pos = getTruckPos(truck);
+  if(truckMarker) map_el.removeLayer(truckMarker);
+  if(destMarker) map_el.removeLayer(destMarker);
+  if(routeLine) map_el.removeLayer(routeLine);
+
+  truckMarker = L.marker(pos, {icon: createIcon(`<div class="truck-marker">${truck.emoji}</div>`, 42)}).addTo(map_el);
+  destMarker = L.marker(truck.dest, {icon: createIcon(`<div class="dest-marker">📍</div>`, 36)}).addTo(map_el)
+    .bindTooltip(truck.destLabel, {permanent:true, direction:'top', offset:[0,-18], className:'leaflet-tooltip'});
+
+  // Route
+  routeLine = L.polyline(truck.route, {color:'#E05A1A', weight:3, opacity:.5, dashArray:'6,6'}).addTo(map_el);
+
+  const bounds = L.latLngBounds([pos, truck.dest]);
+  map_el.fitBounds(bounds, {padding:[60,60]});
+}
+
+// Animate truck
+function animateTruck() {
+  animFrame++;
+  if(animFrame % 60 === 0) { // every ~1s
+    const truck = TRUCKS[currentTruck];
+    truck.progress = Math.min(truck.progress + 0.002, 0.999);
+    const pos = getTruckPos(truck);
+    if(truckMarker) truckMarker.setLatLng(pos);
+
+    // Update speed display randomly
+    const speed = Math.round(80 + Math.random()*30);
+    document.getElementById('speed-display').innerHTML = speed + ' <span>km/h</span>';
+  }
+  requestAnimationFrame(animateTruck);
+}
+
+renderTruck(0);
+animateTruck();
+
+// View toggle
+function setView(v) {
+  document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if(v === 'client') {
+    document.getElementById('client-view').style.display = 'flex';
+    document.getElementById('fleet-view').style.display = 'none';
+    document.getElementById('sb-title').textContent = 'Votre déménagement';
+    document.getElementById('sb-sub').textContent = 'Commande #NS-2847 · Paris → Lyon';
+    currentTruck = 0;
+    renderTruck(0);
+  } else {
+    document.getElementById('client-view').style.display = 'none';
+    document.getElementById('fleet-view').style.display = 'flex';
+    document.getElementById('sb-title').textContent = 'Tableau de bord flotte';
+    document.getElementById('sb-sub').textContent = '3 camions actifs aujourd\'hui';
+  }
+}
+
+function selectTruck(el, idx) {
+  document.querySelectorAll('.truck-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  currentTruck = idx;
+  renderTruck(idx);
+}
+
+// ETA countdown
+function updateETA() {
+  const now = new Date();
+  const target = new Date();
+  target.setHours(14,35,0,0);
+  const diff = Math.max(0, Math.floor((target-now)/60000));
+  const h = Math.floor(diff/60), m = diff%60;
+  const label = h > 0 ? `${h}h${m < 10 ? '0'+m : m}` : `${m} min`;
+  document.getElementById('eta-desc').innerHTML = `Dans environ <strong style="color:#fff">${label}</strong> · 38 km restants`;
+}
+updateETA();
+setInterval(updateETA, 30000);
+</script>
+</body>
+</html>
