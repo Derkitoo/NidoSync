@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NidoSync — Inventaire IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#111110;--white:#FAFAF8;--off:#F3F1EC;
+  --orange:#E05A1A;--orange-dim:#FEF0E8;
+  --teal:#17907A;--teal-dim:#E2F5F0;
+  --muted:#82807A;--border:#E4E1DA;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --max:1100px;
+}
+html{font-size:16px}
+body{font-family:var(--sans);background:var(--white);color:var(--black);min-height:100vh}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(250,250,248,.9);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+.nav-in{max-width:var(--max);margin:0 auto;padding:0 2.5rem;height:62px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--serif);font-size:1.35rem;color:var(--black)}
+.logo em{color:var(--orange);font-style:italic}
+.demo-badge{background:var(--orange-dim);color:var(--orange);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .75rem;border-radius:100px}
+
+.page{max-width:var(--max);margin:0 auto;padding:5.5rem 2.5rem 4rem}
+.page-head{margin-bottom:3rem}
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:.875rem}
+h1{font-family:var(--serif);font-size:3rem;font-weight:400;letter-spacing:-.75px;line-height:1.08;margin-bottom:.875rem}
+h1 em{font-style:italic;color:var(--orange)}
+.page-sub{font-size:1rem;color:var(--muted);font-weight:300;line-height:1.75;max-width:540px}
+
+.layout{display:grid;grid-template-columns:1fr 400px;gap:2rem;align-items:start}
+
+/* UPLOAD */
+.upload-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.uc-head{padding:1.375rem 1.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.uc-title{font-size:.875rem;font-weight:600}
+.uc-count{font-size:.75rem;color:var(--muted);background:var(--off);padding:.25rem .75rem;border-radius:100px}
+.drop-zone{
+  margin:1.5rem;border:2px dashed var(--border);border-radius:14px;
+  padding:2.75rem;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;position:relative;
+}
+.drop-zone:hover,.drop-zone.over{border-color:var(--orange);background:var(--orange-dim)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-ico{font-size:2.75rem;margin-bottom:1rem;display:block}
+.dz-title{font-size:.9375rem;font-weight:600;color:var(--black);margin-bottom:.375rem}
+.dz-sub{font-size:.8125rem;color:var(--muted)}
+.dz-sub span{color:var(--orange);font-weight:500}
+
+.previews{padding:0 1.5rem 1.5rem;display:grid;grid-template-columns:repeat(4,1fr);gap:.625rem}
+.prev-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--off)}
+.prev-item img{width:100%;height:100%;object-fit:cover;display:block}
+.prev-rm{
+  position:absolute;top:4px;right:4px;width:22px;height:22px;
+  border-radius:50%;background:rgba(0,0,0,.65);border:none;cursor:pointer;
+  color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.prev-lbl{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.55));
+  color:#fff;font-size:.6rem;font-weight:600;padding:.5rem .4rem .3rem;
+}
+
+.uc-actions{padding:1.25rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem}
+.btn-analyze{
+  flex:1;padding:.9rem;background:var(--orange);color:#fff;border:none;
+  border-radius:100px;font-family:var(--sans);font-size:.9375rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.625rem;
+  box-shadow:0 4px 20px rgba(224,90,26,.25);transition:transform .2s,box-shadow .2s,opacity .2s;
+}
+.btn-analyze:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(224,90,26,.35)}
+.btn-analyze:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-reset{
+  padding:.9rem 1.25rem;background:var(--off);color:var(--muted);
+  border:1px solid var(--border);border-radius:100px;
+  font-family:var(--sans);font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s;
+}
+.btn-reset:hover{background:var(--border)}
+
+/* RESULTS */
+.results-panel{display:flex;flex-direction:column;gap:1.25rem}
+
+/* LOADING */
+.loading-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:2.5rem;display:none;text-align:center}
+.spinner{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 1.25rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-card h3{font-family:var(--serif);font-size:1.5rem;font-weight:400;margin-bottom:.375rem}
+.loading-card p{font-size:.875rem;color:var(--muted);margin-bottom:1.5rem}
+.lst{display:flex;align-items:center;gap:.75rem;font-size:.8125rem;color:var(--muted);padding:.5rem .875rem;border-radius:8px;transition:all .3s;text-align:left}
+.lst+.lst{margin-top:.375rem}
+.lst.active{background:var(--orange-dim);color:var(--orange);font-weight:600}
+.lst.done{color:var(--teal);font-weight:500}
+.lst-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.lst.active .lst-dot{background:var(--orange)}
+.lst.done .lst-dot{background:var(--teal)}
+
+/* VOL */
+.vol-card{background:var(--black);border-radius:20px;padding:1.75rem;display:none}
+.vol-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem}
+.vol-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.5rem}
+.vol-num{font-family:var(--serif);font-size:3.75rem;font-weight:400;color:#fff;line-height:1}
+.vol-num span{font-size:1.5rem;color:var(--orange)}
+.vol-badge{background:var(--orange);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.35rem .875rem;border-radius:100px;white-space:nowrap;margin-top:.25rem}
+.vol-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.vol-stat{background:rgba(255,255,255,.06);border-radius:12px;padding:1rem}
+.vol-stat-n{font-family:var(--serif);font-size:1.625rem;color:#fff;line-height:1;margin-bottom:.2rem}
+.vol-stat-l{font-size:.75rem;color:rgba(255,255,255,.38)}
+
+/* MEUBLES */
+.meubles-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;display:none}
+.mc-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mc-title{font-size:.875rem;font-weight:600}
+.mc-badge{font-size:.75rem;color:var(--muted);background:var(--off);padding:.25rem .75rem;border-radius:100px}
+.meubles-list{padding:.75rem}
+.m-row{display:flex;align-items:center;gap:.875rem;padding:.75rem 1rem;border-radius:10px;transition:background .15s}
+.m-row:hover{background:var(--off)}
+.m-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.0625rem;flex-shrink:0;background:var(--off)}
+.m-name{flex:1;font-size:.875rem;font-weight:600}
+.m-qty{font-size:.7rem;font-weight:700;background:var(--off);color:var(--muted);padding:.2rem .5rem;border-radius:100px;margin-left:.25rem}
+.m-vol{font-size:.8125rem;color:var(--muted);white-space:nowrap;margin-left:.5rem}
+
+/* DEVIS */
+.devis-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;display:none}
+.dc-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.dc-title{font-size:.875rem;font-weight:600;margin-bottom:.2rem}
+.dc-sub{font-size:.75rem;color:var(--muted)}
+.dc-body{padding:1.25rem 1.5rem}
+.dc-row{display:flex;justify-content:space-between;align-items:center;padding:.625rem 0;border-bottom:1px solid var(--off)}
+.dc-row:last-child{border:none;padding-top:1rem}
+.dc-lbl{font-size:.8125rem;color:var(--muted)}
+.dc-val{font-size:.875rem;font-weight:600}
+.dc-total{background:var(--off);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;margin-top:.5rem}
+.dc-total-lbl{font-size:.9375rem;font-weight:600}
+.dc-total-val{font-family:var(--serif);font-size:1.75rem;color:var(--orange)}
+.dc-foot{padding:1.25rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem}
+.btn-pdf{flex:1;padding:.875rem;background:var(--black);color:#fff;border:none;border-radius:100px;font-family:var(--sans);font-size:.875rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .2s}
+.btn-pdf:hover{opacity:.8}
+.btn-new{padding:.875rem 1.25rem;background:var(--off);color:var(--muted);border:1px solid var(--border);border-radius:100px;font-family:var(--sans);font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s}
+.btn-new:hover{background:var(--border)}
+
+/* EMPTY */
+.empty-state{background:#fff;border:1px solid var(--border);border-radius:20px;padding:3rem 2rem;text-align:center}
+.es-ico{font-size:2.5rem;margin-bottom:1rem;display:block;opacity:.35}
+.es-title{font-size:.9375rem;font-weight:600;color:var(--muted);margin-bottom:.375rem}
+.es-sub{font-size:.8125rem;color:var(--muted);line-height:1.65}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .page{padding:5rem 1.5rem 3rem}
+  h1{font-size:2.25rem}
+  .nav-in{padding:0 1.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="logo">Nido<em>Sync</em> <span style="font-family:var(--sans);font-size:.875rem;font-weight:400;color:var(--muted)">· Inventaire IA</span></div>
+    <span class="demo-badge">✦ Mode démo</span>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-head">
+    <div class="eyebrow">Outil déménageur</div>
+    <h1>Inventaire <em>intelligent</em><br/>par intelligence artificielle</h1>
+    <p class="page-sub">Photographiez les pièces à déménager. L'IA détecte automatiquement les meubles, calcule le volume en m³ et génère un devis en quelques secondes.</p>
+  </div>
+
+  <div class="layout">
+    <div class="upload-card">
+      <div class="uc-head">
+        <span class="uc-title">Photos des pièces</span>
+        <span class="uc-count" id="photo-count">0 photo</span>
+      </div>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" multiple accept="image/*"/>
+        <span class="dz-ico">📸</span>
+        <div class="dz-title">Glissez vos photos ici</div>
+        <div class="dz-sub">ou <span>cliquez pour sélectionner</span> · JPG, PNG, HEIC</div>
+      </div>
+      <div class="previews" id="previews"></div>
+      <div class="uc-actions">
+        <button class="btn-analyze" id="btn-analyze" disabled onclick="startAnalysis()">
+          ✨ Analyser avec l'IA
+        </button>
+        <button class="btn-reset" onclick="resetAll()">Effacer</button>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="loading-card" id="loading-card">
+        <div class="spinner"></div>
+        <h3>Analyse en cours…</h3>
+        <p>Mistral Vision examine vos photos</p>
+        <div class="lst" id="lst1"><span class="lst-dot"></span>Détection des meubles et objets</div>
+        <div class="lst" id="lst2"><span class="lst-dot"></span>Estimation des volumes unitaires</div>
+        <div class="lst" id="lst3"><span class="lst-dot"></span>Génération du devis</div>
+      </div>
+
+      <div class="vol-card" id="vol-card">
+        <div class="vol-top">
+          <div>
+            <div class="vol-label">Volume total estimé</div>
+            <div class="vol-num" id="vol-num">— <span>m³</span></div>
+          </div>
+          <div class="vol-badge" id="vol-camion">—</div>
+        </div>
+        <div class="vol-grid">
+          <div class="vol-stat">
+            <div class="vol-stat-n" id="stat-pieces">—</div>
+            <div class="vol-stat-l">Pièces analysées</div>
+          </div>
+          <div class="vol-stat">
+            <div class="vol-stat-n" id="stat-items">—</div>
+            <div class="vol-stat-l">Meubles détectés</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="meubles-card" id="meubles-card">
+        <div class="mc-head">
+          <span class="mc-title">Meubles détectés</span>
+          <span class="mc-badge" id="mc-badge">0 article</span>
+        </div>
+        <div class="meubles-list" id="meubles-list"></div>
+      </div>
+
+      <div class="devis-card" id="devis-card">
+        <div class="dc-head">
+          <div class="dc-title">Estimation de déménagement</div>
+          <div class="dc-sub">Tarifs indicatifs · à affiner selon la distance</div>
+        </div>
+        <div class="dc-body" id="dc-body"></div>
+        <div class="dc-foot">
+          <button class="btn-pdf" onclick="generatePDF()">📄 Télécharger le devis PDF</button>
+          <button class="btn-new" onclick="resetAll()">Nouveau</button>
+        </div>
+      </div>
+
+      <div class="empty-state" id="empty-state">
+        <span class="es-ico">🏠</span>
+        <div class="es-title">En attente de photos</div>
+        <div class="es-sub">Ajoutez 1 à 10 photos de vos pièces<br/>puis cliquez sur "Analyser avec l'IA"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DÉMO DATA — remplacer par appel Mistral en prod ──
+const DEMO_SETS = [
+  [
+    {nom:'Canapé 3 places',emoji:'🛋️',quantite:1,vol:1.8},
+    {nom:'Fauteuil',emoji:'🪑',quantite:1,vol:0.6},
+    {nom:'Table basse',emoji:'🟫',quantite:1,vol:0.3},
+    {nom:'Meuble TV',emoji:'📺',quantite:1,vol:0.6},
+    {nom:'Bibliothèque',emoji:'📚',quantite:2,vol:0.9},
+    {nom:'Tapis',emoji:'🟥',quantite:1,vol:0.2},
+  ],[
+    {nom:'Lit 160×200',emoji:'🛏️',quantite:1,vol:1.2},
+    {nom:'Armoire penderie',emoji:'🚪',quantite:1,vol:2.2},
+    {nom:'Commode',emoji:'🗃️',quantite:1,vol:0.5},
+    {nom:'Table de chevet',emoji:'🪴',quantite:2,vol:0.12},
+    {nom:'Bureau',emoji:'🖥️',quantite:1,vol:0.8},
+    {nom:'Chaise de bureau',emoji:'💺',quantite:1,vol:0.35},
+  ],[
+    {nom:'Table à manger',emoji:'🍽️',quantite:1,vol:0.9},
+    {nom:'Chaises',emoji:'🪑',quantite:6,vol:0.15},
+    {nom:'Réfrigérateur',emoji:'🧊',quantite:1,vol:0.5},
+    {nom:'Lave-linge',emoji:'🌀',quantite:1,vol:0.3},
+    {nom:'Micro-ondes',emoji:'📦',quantite:1,vol:0.05},
+    {nom:'Étagère cuisine',emoji:'🗂️',quantite:2,vol:0.4},
+  ]
+];
+
+let photos = [];
+let currentResult = null;
+
+// Upload
+document.getElementById('file-input').addEventListener('change', e => addFiles(e.target.files));
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); addFiles(e.dataTransfer.files); });
+
+function addFiles(files) {
+  [...files].forEach(f => {
+    if(!f.type.startsWith('image/') || photos.length >= 10) return;
+    const r = new FileReader();
+    r.onload = e => { photos.push({dataUrl: e.target.result, name: f.name}); renderPreviews(); };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderPreviews() {
+  const el = document.getElementById('previews');
+  el.innerHTML = '';
+  photos.forEach((p,i) => {
+    const d = document.createElement('div');
+    d.className = 'prev-item';
+    d.innerHTML = `<img src="${p.dataUrl}"/><button class="prev-rm" onclick="removePhoto(${i})">×</button><div class="prev-lbl">Pièce ${i+1}</div>`;
+    el.appendChild(d);
+  });
+  document.getElementById('photo-count').textContent = photos.length + ' photo' + (photos.length > 1 ? 's' : '');
+  document.getElementById('btn-analyze').disabled = photos.length === 0;
+}
+
+function removePhoto(i) { photos.splice(i,1); renderPreviews(); }
+
+function resetAll() {
+  photos = []; currentResult = null;
+  renderPreviews();
+  document.getElementById('file-input').value = '';
+  ['loading-card','vol-card','meubles-card','devis-card'].forEach(hide);
+  show('empty-state');
+  document.getElementById('btn-analyze').disabled = true;
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('lst'+i);
+    el.classList.remove('active','done');
+    if(i < n) el.classList.add('done');
+    if(i === n) el.classList.add('active');
+  });
+}
+
+function startAnalysis() {
+  hide('empty-state'); hide('vol-card'); hide('meubles-card'); hide('devis-card');
+  show('loading-card');
+  document.getElementById('btn-analyze').disabled = true;
+  setStep(1);
+
+  // Simule les étapes de l'IA
+  setTimeout(() => setStep(2), 1400);
+  setTimeout(() => setStep(3), 2600);
+  setTimeout(() => {
+    // Sélection démo en fonction du nb de photos
+    const sets = photos.length === 1 ? [DEMO_SETS[0]] :
+                 photos.length === 2 ? [DEMO_SETS[0], DEMO_SETS[1]] : DEMO_SETS;
+    // Fusion et léger aléatoire
+    let meubles = sets.flatMap(s => s).map(m => ({
+      ...m,
+      vol: parseFloat((m.vol * (0.9 + Math.random() * 0.2)).toFixed(2))
+    }));
+    currentResult = { meubles, pieces: photos.length };
+    renderResults(currentResult);
+  }, 3800);
+}
+
+function renderResults(data) {
+  hide('loading-card');
+
+  const totalVol = data.meubles.reduce((s,m) => s + m.vol * m.quantite, 0);
+  const totalItems = data.meubles.reduce((s,m) => s + m.quantite, 0);
+  const camion = totalVol < 10 ? 'Petit camion 10m³' : totalVol < 20 ? 'Camion 20m³' : 'Grand camion 30m³+';
+
+  // Volume card
+  document.getElementById('vol-num').innerHTML = totalVol.toFixed(1) + ' <span>m³</span>';
+  document.getElementById('vol-camion').textContent = camion;
+  document.getElementById('stat-pieces').textContent = data.pieces;
+  document.getElementById('stat-items').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
+  show('vol-card');
+
+  // Meubles
+  const list = document.getElementById('meubles-list');
+  list.innerHTML = '';
+  data.meubles.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'm-row';
+    row.innerHTML = `
+      <div class="m-ico">${m.emoji}</div>
+      <div class="m-name">${m.nom}</div>
+      ${m.quantite > 1 ? `<span class="m-qty">×${m.quantite}</span>` : ''}
+      <div class="m-vol">${(m.vol * m.quantite).toFixed(2)} m³</div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('mc-badge').textContent = totalItems + ' article' + (totalItems > 1 ? 's' : '');
+  show('meubles-card');
+
+  // Devis
+  const base = Math.round(totalVol * 45);
+  const emballage = Math.round(base * 0.15);
+  const assurance = Math.round(base * 0.05);
+  const total = base + emballage + assurance;
+  document.getElementById('dc-body').innerHTML = `
+    <div class="dc-row"><span class="dc-lbl">Main d'œuvre & transport (${totalVol.toFixed(1)} m³ × 45€)</span><span class="dc-val">${base}€</span></div>
+    <div class="dc-row"><span class="dc-lbl">Emballage & matériel</span><span class="dc-val">${emballage}€</span></div>
+    <div class="dc-row"><span class="dc-lbl">Assurance marchandises</span><span class="dc-val">${assurance}€</span></div>
+    <div class="dc-total"><span class="dc-total-lbl">Total estimé HT</span><span class="dc-total-val">${total}€</span></div>`;
+  show('devis-card');
+  document.getElementById('btn-analyze').disabled = false;
+}
+
+function generatePDF() {
+  if(!currentResult) return;
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const d = currentResult;
+  const totalVol = d.meubles.reduce((s,m) => s + m.vol * m.quantite, 0);
+  const base = Math.round(totalVol * 45);
+  const emballage = Math.round(base * 0.15);
+  const assurance = Math.round(base * 0.05);
+  const total = base + emballage + assurance;
+  const date = new Date().toLocaleDateString('fr-FR');
+  const ref = 'NS-' + Date.now().toString().slice(-6);
+
+  // Header orange
+  doc.setFillColor(224,90,26);
+  doc.rect(0,0,210,38,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);doc.setFont('helvetica','bold');
+  doc.text('NidoSync',20,18);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');
+  doc.text('Conciergerie & Inventaire IA',20,27);
+  doc.text('Devis N° '+ref+' · '+date,150,27,{align:'right'});
+
+  // Volume bloc
+  doc.setTextColor(17,17,16);
+  doc.setFontSize(11);doc.setFont('helvetica','bold');
+  doc.text('Volume total estimé',20,52);
+  doc.setFontSize(30);doc.setTextColor(224,90,26);
+  doc.text(totalVol.toFixed(1)+' m³',20,66);
+  doc.setFontSize(9);doc.setTextColor(130,128,122);doc.setFont('helvetica','normal');
+  doc.text(d.pieces+' pièce(s) analysée(s) · '+d.meubles.reduce((s,m)=>s+m.quantite,0)+' articles',20,74);
+
+  // Séparateur
+  doc.setDrawColor(228,225,218);doc.line(20,80,190,80);
+
+  // Meubles
+  doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(17,17,16);
+  doc.text('Détail des meubles',20,90);
+  let y=98;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  d.meubles.forEach(m => {
+    if(y>260){doc.addPage();y=20;}
+    doc.setTextColor(17,17,16);
+    doc.text(m.nom+(m.quantite>1?' ×'+m.quantite:''),25,y);
+    doc.setTextColor(130,128,122);
+    doc.text((m.vol*m.quantite).toFixed(2)+' m³',185,y,{align:'right'});
+    y+=7;
+  });
+
+  // Ligne
+  y+=4;doc.setDrawColor(228,225,218);doc.line(20,y,190,y);y+=10;
+
+  // Devis
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(17,17,16);
+  doc.text('Estimation financière',20,y);y+=10;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  [[`Main d'œuvre & transport (${totalVol.toFixed(1)} m³ × 45€)`,base+'€'],
+   ['Emballage & matériel',emballage+'€'],
+   ['Assurance marchandises',assurance+'€']
+  ].forEach(([l,v])=>{
+    doc.setTextColor(130,128,122);doc.text(l,25,y);
+    doc.setTextColor(17,17,16);doc.text(v,185,y,{align:'right'});
+    y+=8;
+  });
+
+  // Total box
+  y+=2;
+  doc.setFillColor(254,240,232);doc.roundedRect(18,y-5,174,18,3,3,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(12);
+  doc.setTextColor(224,90,26);doc.text('Total estimé HT',25,y+6);
+  doc.text(total+'€',185,y+6,{align:'right'});
+
+  // Footer
+  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(130,128,122);
+  doc.text('Estimation générée automatiquement par IA · Les tarifs définitifs dépendent de la distance, étages et conditions d\'accès.',20,283);
+  doc.text('NidoSync · nidosync.fr · contact@nidosync.fr',105,289,{align:'center'});
+
+  doc.save('devis-nidosync-'+ref+'.pdf');
+}
+</script>
+</body>
+</html>
