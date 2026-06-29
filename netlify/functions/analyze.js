@@ -32,12 +32,13 @@ Réponds UNIQUEMENT en JSON valide, sans markdown, sans explication, exactement 
   "resume": "Appartement T2 bien meublé"
 }
 
-Règles :
-- Liste tous les meubles et gros appareils visibles
-- Estime le volume unitaire en m³ avec précision
+Règles STRICTES :
+- Liste UNIQUEMENT les meubles et appareils électroménagers déplaçables
+- Estime le volume_unitaire en m³ avec précision (nombre décimal)
 - Utilise un emoji pertinent pour chaque meuble
-- Ne liste que ce qui est visible sur les photos
-- Les volumes doivent être réalistes (canapé ~1.8m³, lit double ~1.4m³, armoire ~2m³)`
+- EXCLUSIONS ABSOLUES — ne jamais inclure : fenêtres, portes, murs, plafonds, sols, luminaires fixes au plafond, radiateurs, prises électriques, interrupteurs, éléments de construction
+- Les volumes doivent être réalistes : canapé 3 places ~1.8m³, lit double ~1.4m³, armoire ~2m³, table ~0.9m³, chaise ~0.15m³
+- volume_unitaire doit toujours être un nombre décimal valide (ex: 1.8), jamais null ou vide`
     },
     ...images.map(dataUrl => {
       const [meta, data] = dataUrl.split(',');
