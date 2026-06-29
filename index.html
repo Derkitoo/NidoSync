@@ -631,13 +631,34 @@ footer{
 
 <script>
 function tog(el){el.classList.toggle('on')}
-function sub(){
-  const p=document.getElementById('prenom').value.trim();
-  const ph=document.getElementById('phone').value.trim();
-  const v=document.getElementById('ville').value.trim();
-  if(!p||!ph||!v){alert('Merci de renseigner votre prénom, téléphone et ville.');return;}
-  document.getElementById('fb').style.display='none';
-  document.getElementById('ok').style.display='block';
+async function sub(){
+  const prenom=document.getElementById('prenom').value.trim();
+  const nom=document.getElementById('nom').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const ville=document.getElementById('ville').value.trim();
+  const date=document.getElementById('date').value;
+  if(!prenom||!phone||!ville){alert('Merci de renseigner votre prénom, téléphone et ville.');return;}
+  const checks=[...document.querySelectorAll('.ck.on')].map(el=>el.innerText.replace(/^./,'')).join(', ');
+  const btn=document.querySelector('.submit-btn');
+  btn.disabled=true;btn.textContent='Envoi en cours...';
+  try{
+    const res=await fetch('https://formspree.io/f/xqevlyww',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({prenom,nom,telephone:phone,ville,date_emmenagement:date,services:checks||'Non précisé'})
+    });
+    const data=await res.json();
+    if(res.ok){
+      document.getElementById('fb').style.display='none';
+      document.getElementById('ok').style.display='block';
+    } else {
+      alert('Une erreur est survenue : '+(data.error||'réessayez plus tard.'));
+      btn.disabled=false;btn.textContent='Être rappelé gratuitement';
+    }
+  } catch(e){
+    alert('Erreur réseau. Vérifiez votre connexion et réessayez.');
+    btn.disabled=false;btn.textContent='Être rappelé gratuitement';
+  }
 }
 document.getElementById('date').min=new Date().toISOString().split('T')[0];
 </script>
