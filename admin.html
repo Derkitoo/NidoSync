@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NidoSync — Transfert Administratif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#111110;--white:#FAFAF8;--off:#F3F1EC;
+  --orange:#E05A1A;--orange-dim:#FEF0E8;
+  --teal:#17907A;--teal-dim:#E2F5F0;
+  --red:#C0392B;--red-dim:#FDECEA;
+  --muted:#82807A;--border:#E4E1DA;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --max:1100px;
+}
+html{font-size:16px}
+body{font-family:var(--sans);background:var(--off);color:var(--black);min-height:100vh}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  background:rgba(250,250,248,.92);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2.5rem;height:60px;
+}
+.logo{font-family:var(--serif);font-size:1.3rem;color:var(--black);text-decoration:none}
+.logo em{color:var(--orange);font-style:italic}
+.nav-links{display:flex;align-items:center;gap:1.75rem}
+.nav-links a{font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--black)}
+.nav-links a.active{color:var(--orange);font-weight:600}
+.nav-cta{background:var(--black)!important;color:#fff!important;padding:.5rem 1.25rem;border-radius:100px;font-size:.8125rem!important;font-weight:600!important}
+.demo-badge{background:var(--orange-dim);color:var(--orange);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .75rem;border-radius:100px}
+
+.page{max-width:var(--max);margin:0 auto;padding:5.5rem 2.5rem 4rem}
+
+/* HEADER */
+.page-head{margin-bottom:2.5rem;display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.ph-left .eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:.75rem}
+.ph-left h1{font-family:var(--serif);font-size:2.75rem;font-weight:400;letter-spacing:-.75px;line-height:1.08;margin-bottom:.5rem}
+.ph-left h1 em{font-style:italic;color:var(--orange)}
+.ph-left p{font-size:.9375rem;color:var(--muted);font-weight:300;max-width:480px;line-height:1.7}
+
+/* PROGRESS RING */
+.progress-ring-wrap{flex-shrink:0;text-align:center}
+.ring-container{position:relative;width:100px;height:100px;margin:0 auto .5rem}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:8}
+.ring-fill{fill:none;stroke:var(--teal);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-family:var(--serif);font-size:1.625rem;color:var(--black);line-height:1}
+.ring-lbl{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.ring-sub{font-size:.75rem;color:var(--muted)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start}
+
+/* SETUP CARD */
+.setup-card{
+  background:#fff;border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;margin-bottom:1.25rem;
+}
+.sc-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sc-title{font-size:.875rem;font-weight:600}
+.sc-badge{font-size:.75rem;color:var(--teal);background:var(--teal-dim);padding:.25rem .75rem;border-radius:100px;font-weight:600}
+.sc-body{padding:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fg{display:flex;flex-direction:column;gap:.375rem}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:.675rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fg input,.fg select{
+  padding:.8125rem 1rem;border:1.5px solid var(--border);border-radius:10px;
+  font-family:var(--sans);font-size:.9375rem;color:var(--black);background:#fff;
+  outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.fg input:focus,.fg select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(224,90,26,.08)}
+.btn-init{
+  grid-column:1/-1;padding:.9375rem;background:var(--orange);color:#fff;border:none;
+  border-radius:100px;font-family:var(--sans);font-size:.9375rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.625rem;
+  box-shadow:0 4px 20px rgba(224,90,26,.25);transition:transform .2s,box-shadow .2s;
+}
+.btn-init:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(224,90,26,.35)}
+
+/* ORGANISME CARDS */
+.org-section{margin-bottom:.5rem}
+.org-cat{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:1.5rem 0 .75rem;padding-left:.25rem}
+.org-card{
+  background:#fff;border:1.5px solid var(--border);border-radius:16px;
+  padding:1.125rem 1.25rem;margin-bottom:.625rem;
+  display:flex;align-items:center;gap:1rem;
+  transition:border-color .2s,box-shadow .2s;cursor:pointer;
+}
+.org-card:hover{border-color:rgba(224,90,26,.3);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.org-card.done{border-color:var(--teal);background:rgba(231,247,244,.4)}
+.org-card.skipped{opacity:.5}
+.org-ico{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.125rem;flex-shrink:0;background:var(--off);
+}
+.org-info{flex:1;min-width:0}
+.org-name{font-size:.9375rem;font-weight:600;margin-bottom:.15rem}
+.org-desc{font-size:.75rem;color:var(--muted);line-height:1.45}
+.org-time{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:.3rem;margin-top:.25rem}
+.org-time::before{content:'⏱';font-size:.65rem}
+.org-actions{display:flex;align-items:center;gap:.625rem;flex-shrink:0}
+.btn-do{
+  padding:.5rem 1.125rem;border-radius:100px;
+  font-family:var(--sans);font-size:.8125rem;font-weight:600;
+  cursor:pointer;transition:all .15s;border:none;
+}
+.btn-do.primary{background:var(--orange);color:#fff}
+.btn-do.primary:hover{opacity:.85}
+.btn-do.done{background:var(--teal);color:#fff;cursor:default}
+.btn-do.secondary{background:var(--off);color:var(--muted);border:1.5px solid var(--border)}
+.btn-do.secondary:hover{border-color:var(--muted)}
+.org-check{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;border:2px solid var(--border);
+  transition:all .2s;cursor:pointer;
+}
+.org-check.checked{background:var(--teal);border-color:var(--teal);color:#fff}
+.org-check svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:1.25rem}
+
+/* CHECKLIST RAPIDE */
+.ql-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.ql-head{padding:1.125rem 1.375rem;border-bottom:1px solid var(--border)}
+.ql-title{font-size:.875rem;font-weight:600;margin-bottom:.2rem}
+.ql-sub{font-size:.75rem;color:var(--muted)}
+.ql-body{padding:.75rem}
+.ql-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.625rem .875rem;border-radius:10px;
+  transition:background .15s;cursor:pointer;
+}
+.ql-item:hover{background:var(--off)}
+.ql-tick{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.ql-tick.on{background:var(--teal);border-color:var(--teal)}
+.ql-tick svg{width:9px;height:9px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.ql-name{font-size:.8125rem;font-weight:500}
+.ql-name.done-txt{color:var(--muted);text-decoration:line-through}
+
+/* INFOS CARD */
+.info-card{background:var(--black);border-radius:20px;padding:1.75rem}
+.ic-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:1rem}
+.ic-row{display:flex;justify-content:space-between;align-items:center;padding:.625rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.ic-row:last-child{border:none}
+.ic-key{font-size:.8125rem;color:rgba(255,255,255,.45)}
+.ic-val{font-size:.875rem;font-weight:600;color:#fff}
+.ic-val.orange{color:var(--orange)}
+
+/* TIPS CARD */
+.tips-card{background:var(--orange-dim);border:1px solid rgba(224,90,26,.15);border-radius:20px;padding:1.5rem}
+.tips-title{font-size:.8125rem;font-weight:700;color:var(--orange);margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+.tip{font-size:.8rem;color:var(--black);line-height:1.6;padding:.5rem 0;border-bottom:1px solid rgba(224,90,26,.1);display:flex;gap:.625rem}
+.tip:last-child{border:none;padding-bottom:0}
+.tip::before{content:'→';color:var(--orange);font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* MODAL */
+.modal{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:1.5rem;
+}
+.modal.open{display:flex}
+.modal-box{
+  background:#fff;border-radius:24px;padding:2.5rem;
+  max-width:480px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,.18);
+}
+.modal-box h3{font-family:var(--serif);font-size:1.75rem;font-weight:400;margin-bottom:.375rem}
+.modal-box .msub{font-size:.875rem;color:var(--muted);margin-bottom:1.75rem;line-height:1.6}
+.modal-steps{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.75rem}
+.ms{display:flex;gap:.875rem;align-items:flex-start}
+.ms-num{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  background:var(--orange-dim);color:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;margin-top:1px;
+}
+.ms-txt{font-size:.875rem;line-height:1.6}
+.ms-txt b{display:block;font-weight:600;margin-bottom:.1rem}
+.modal-actions{display:flex;gap:.75rem}
+.btn-modal-go{
+  flex:1;padding:.9rem;background:var(--orange);color:#fff;border:none;
+  border-radius:100px;font-family:var(--sans);font-size:.9375rem;font-weight:600;
+  cursor:pointer;transition:opacity .2s;
+}
+.btn-modal-go:hover{opacity:.85}
+.btn-modal-done{
+  padding:.9rem 1.25rem;background:var(--teal);color:#fff;border:none;
+  border-radius:100px;font-family:var(--sans);font-size:.875rem;font-weight:600;
+  cursor:pointer;transition:opacity .2s;
+}
+.btn-modal-done:hover{opacity:.85}
+.btn-modal-close{
+  padding:.9rem 1.25rem;background:var(--off);color:var(--muted);
+  border:1.5px solid var(--border);border-radius:100px;
+  font-family:var(--sans);font-size:.875rem;font-weight:500;cursor:pointer;
+}
+
+/* NOTIF */
+.notif{
+  position:fixed;bottom:2rem;right:2rem;z-index:600;
+  background:var(--teal);color:#fff;
+  padding:1rem 1.5rem;border-radius:14px;
+  font-size:.875rem;font-weight:500;
+  display:flex;align-items:center;gap:.75rem;
+  box-shadow:0 8px 24px rgba(23,144,122,.3);
+  transform:translateY(100px);opacity:0;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+}
+.notif.show{transform:translateY(0);opacity:1}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .page{padding:5rem 1.5rem 3rem}
+  nav{padding:0 1.25rem}
+  h1{font-size:2rem}
+  .sc-body{grid-template-columns:1fr}
+  .nav-links a:not(.nav-cta):not(.active){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Nido<em>Sync</em></a>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="inventaire.html">✨ Inventaire IA</a>
+    <a href="suivi.html">🚚 Suivi GPS</a>
+    <a href="stockage.html">📦 Stockage</a>
+    <a href="admin.html" class="active">📋 Démarches</a>
+    <span class="demo-badge">✦ Démo</span>
+    <a href="index.html#contact" class="nav-cta">Être rappelé →</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-head">
+    <div class="ph-left">
+      <div class="eyebrow">Votre espace administratif</div>
+      <h1>Changement d'adresse<br/><em>sans prise de tête</em></h1>
+      <p>Tous vos organismes au même endroit. Cochez au fur et à mesure — on garde votre progression.</p>
+    </div>
+    <div class="progress-ring-wrap">
+      <div class="ring-container">
+        <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="42"/>
+          <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-lbl">Fait</div>
+        </div>
+      </div>
+      <div class="ring-sub" id="ring-sub">0 / 14 démarches</div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <!-- SETUP -->
+      <div class="setup-card" id="setup-card">
+        <div class="sc-head">
+          <span class="sc-title">Renseignez votre nouvelle adresse</span>
+          <span class="sc-badge">Étape 1</span>
+        </div>
+        <div class="sc-body">
+          <div class="fg full">
+            <label>Nouvelle adresse complète</label>
+            <input type="text" id="new-addr" placeholder="7 rue de la République, 69001 Lyon"/>
+          </div>
+          <div class="fg">
+            <label>Date d'emménagement</label>
+            <input type="date" id="move-date"/>
+          </div>
+          <div class="fg">
+            <label>Situation</label>
+            <select id="situation">
+              <option>Locataire</option>
+              <option>Propriétaire</option>
+              <option>Hébergé à titre gratuit</option>
+            </select>
+          </div>
+          <button class="btn-init" onclick="initAdmin()">
+            <span>🚀</span> Générer ma liste de démarches personnalisée
+          </button>
+        </div>
+      </div>
+
+      <!-- ORGANISMES -->
+      <div id="orgs-wrap" style="display:none">
+
+        <div class="org-cat">🏛️ Services publics — Priorité haute</div>
+
+        <div class="org-card" data-id="0" onclick="openModal(0)">
+          <div class="org-ico" style="background:#E8F4FD">🏠</div>
+          <div class="org-info">
+            <div class="org-name">Service-Public.fr — Changement d'adresse</div>
+            <div class="org-desc">Notifie automatiquement impôts, CAF, Pôle emploi, carte grise en une seule fois</div>
+            <div class="org-time">5 minutes · En ligne</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="0" onclick="event.stopPropagation();toggleDone(0)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="1" onclick="openModal(1)">
+          <div class="org-ico" style="background:#FFF3E0">💶</div>
+          <div class="org-info">
+            <div class="org-name">Impôts — Mise à jour adresse fiscale</div>
+            <div class="org-desc">Espace particulier impots.gouv.fr → Mon profil → Coordonnées</div>
+            <div class="org-time">3 minutes · impots.gouv.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="1" onclick="event.stopPropagation();toggleDone(1)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="2" onclick="openModal(2)">
+          <div class="org-ico" style="background:#E8F5E9">🏥</div>
+          <div class="org-info">
+            <div class="org-name">Ameli — Sécurité sociale</div>
+            <div class="org-desc">Mise à jour de votre adresse postale et de votre médecin traitant si besoin</div>
+            <div class="org-time">5 minutes · ameli.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="2" onclick="event.stopPropagation();toggleDone(2)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="3" onclick="openModal(3)">
+          <div class="org-ico" style="background:#F3E5F5">👶</div>
+          <div class="org-info">
+            <div class="org-name">CAF — Allocations familiales</div>
+            <div class="org-desc">À faire dans les 30 jours — peut affecter le montant de vos prestations</div>
+            <div class="org-time">5 minutes · caf.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="3" onclick="event.stopPropagation();toggleDone(3)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-cat">🚗 Véhicule & mobilité</div>
+
+        <div class="org-card" data-id="4" onclick="openModal(4)">
+          <div class="org-ico" style="background:#E3F2FD">🚗</div>
+          <div class="org-info">
+            <div class="org-name">Carte grise — Mise à jour adresse</div>
+            <div class="org-desc">Obligatoire sous 1 mois. En ligne via l'ANTS ou chez un professionnel agréé</div>
+            <div class="org-time">10 minutes · ants.gouv.fr · Gratuit</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="4" onclick="event.stopPropagation();toggleDone(4)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="5" onclick="openModal(5)">
+          <div class="org-ico" style="background:#E8EAF6">🪪</div>
+          <div class="org-info">
+            <div class="org-name">Permis de conduire</div>
+            <div class="org-desc">Mise à jour optionnelle mais recommandée via l'ANTS</div>
+            <div class="org-time">5 minutes · ants.gouv.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="5" onclick="event.stopPropagation();toggleDone(5)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-cat">🏦 Banque & assurances</div>
+
+        <div class="org-card" data-id="6" onclick="openModal(6)">
+          <div class="org-ico" style="background:#E0F2F1">🏦</div>
+          <div class="org-info">
+            <div class="org-name">Banque — Mise à jour coordonnées</div>
+            <div class="org-desc">Via votre espace en ligne ou en agence. Important pour vos relevés et courriers</div>
+            <div class="org-time">2 minutes · Votre app bancaire</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="6" onclick="event.stopPropagation();toggleDone(6)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="7" onclick="openModal(7)">
+          <div class="org-ico" style="background:#FFF8E1">🛡️</div>
+          <div class="org-info">
+            <div class="org-name">Assurance habitation</div>
+            <div class="org-desc">Résiliez l'ancienne et souscrivez la nouvelle. Obligation légale dès le 1er jour</div>
+            <div class="org-time">15 minutes · Votre assureur</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="7" onclick="event.stopPropagation();toggleDone(7)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-cat">📡 Énergie & télécoms</div>
+
+        <div class="org-card" data-id="8" onclick="openModal(8)">
+          <div class="org-ico" style="background:#FFF3E0">⚡</div>
+          <div class="org-info">
+            <div class="org-name">EDF / Engie — Contrat énergie</div>
+            <div class="org-desc">Résiliation ancien logement + ouverture nouveau contrat. À faire avant l'emménagement</div>
+            <div class="org-time">10 minutes · En ligne ou par téléphone</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="8" onclick="event.stopPropagation();toggleDone(8)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="9" onclick="openModal(9)">
+          <div class="org-ico" style="background:#E3F2FD">📡</div>
+          <div class="org-info">
+            <div class="org-name">Box Internet — Transfert ou nouvelle offre</div>
+            <div class="org-desc">Vérifiez la disponibilité fibre à votre nouvelle adresse avant de commander</div>
+            <div class="org-time">15 minutes · Votre opérateur</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="9" onclick="event.stopPropagation();toggleDone(9)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-cat">📬 Courrier & divers</div>
+
+        <div class="org-card" data-id="10" onclick="openModal(10)">
+          <div class="org-ico" style="background:#F5F5F5">📮</div>
+          <div class="org-info">
+            <div class="org-name">La Poste — Réexpédition du courrier</div>
+            <div class="org-desc">Service payant (~26€/6 mois) mais indispensable pour ne rien manquer</div>
+            <div class="org-time">5 minutes · laposte.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="10" onclick="event.stopPropagation();toggleDone(10)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="11" onclick="openModal(11)">
+          <div class="org-ico" style="background:#E8F5E9">🗳️</div>
+          <div class="org-info">
+            <div class="org-name">Liste électorale</div>
+            <div class="org-desc">Inscrivez-vous dans votre nouvelle commune avant le 31 décembre</div>
+            <div class="org-time">5 minutes · service-public.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="11" onclick="event.stopPropagation();toggleDone(11)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="12" onclick="openModal(12)">
+          <div class="org-ico" style="background:#FFF3E0">💊</div>
+          <div class="org-info">
+            <div class="org-name">Médecin traitant</div>
+            <div class="org-desc">Déclarez un nouveau médecin traitant proche de votre nouvelle adresse sur Ameli</div>
+            <div class="org-time">5 minutes · ameli.fr</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="12" onclick="event.stopPropagation();toggleDone(12)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="org-card" data-id="13" onclick="openModal(13)">
+          <div class="org-ico" style="background:#F3E5F5">🎓</div>
+          <div class="org-info">
+            <div class="org-name">Employeur / École / Université</div>
+            <div class="org-desc">Informez votre employeur et / ou établissement scolaire de votre nouvelle adresse</div>
+            <div class="org-time">2 minutes · Email interne</div>
+          </div>
+          <div class="org-actions">
+            <div class="org-check" data-id="13" onclick="event.stopPropagation();toggleDone(13)">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar" style="display:none">
+
+      <div class="info-card">
+        <div class="ic-label">Votre nouvelle adresse</div>
+        <div class="ic-row"><span class="ic-key">Adresse</span><span class="ic-val orange" id="ic-addr" style="font-size:.8125rem;text-align:right;max-width:160px">—</span></div>
+        <div class="ic-row"><span class="ic-key">Depuis le</span><span class="ic-val" id="ic-date">—</span></div>
+        <div class="ic-row"><span class="ic-key">Situation</span><span class="ic-val" id="ic-sit">—</span></div>
+        <div class="ic-row"><span class="ic-key">Fait</span><span class="ic-val orange" id="ic-prog">0 / 14</span></div>
+      </div>
+
+      <div class="ql-card">
+        <div class="ql-head">
+          <div class="ql-title">Checklist rapide</div>
+          <div class="ql-sub">Les 5 priorités absolues</div>
+        </div>
+        <div class="ql-body">
+          <div class="ql-item" onclick="toggleDone(0);updateQuick()">
+            <div class="ql-tick" id="qt0"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="ql-name" id="qn0">Service-Public.fr</span>
+          </div>
+          <div class="ql-item" onclick="toggleDone(1);updateQuick()">
+            <div class="ql-tick" id="qt1"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="ql-name" id="qn1">Impôts</span>
+          </div>
+          <div class="ql-item" onclick="toggleDone(7);updateQuick()">
+            <div class="ql-tick" id="qt7"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="ql-name" id="qn7">Assurance habitation</span>
+          </div>
+          <div class="ql-item" onclick="toggleDone(4);updateQuick()">
+            <div class="ql-tick" id="qt4"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="ql-name" id="qn4">Carte grise</span>
+          </div>
+          <div class="ql-item" onclick="toggleDone(10);updateQuick()">
+            <div class="ql-tick" id="qt10"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="ql-name" id="qn10">Réexpédition courrier</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tips-card">
+        <div class="tips-title">💡 Conseils NidoSync</div>
+        <div class="tip">Commencez par Service-Public.fr — il notifie automatiquement plusieurs organismes en même temps.</div>
+        <div class="tip">Faites la carte grise sous 1 mois pour éviter une amende de 135€.</div>
+        <div class="tip">Activez la réexpédition La Poste dès J-3 avant l'emménagement.</div>
+        <div class="tip">Souscrivez l'assurance habitation avant même de recevoir les clés.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <h3 id="modal-title">—</h3>
+    <p class="msub" id="modal-desc">—</p>
+    <div class="modal-steps" id="modal-steps"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-go" id="modal-go" onclick="goToSite()">Accéder au site →</button>
+      <button class="btn-modal-done" onclick="markDoneFromModal()">✓ Marquer fait</button>
+      <button class="btn-modal-close" onclick="closeModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div class="notif" id="notif">✅ <span id="notif-txt">Démarche marquée comme effectuée</span></div>
+
+<script>
+const TOTAL = 14;
+const done = new Set();
+let currentModalId = null;
+
+const ORGS = [
+  {title:'Service-Public.fr',url:'https://www.service-public.fr/particuliers/vosdroits/R11996',steps:[
+    {t:'Connectez-vous',d:'Avec France Connect (impôts, Ameli, La Poste...)'},
+    {t:'Saisissez votre nouvelle adresse',d:'Elle sera transmise automatiquement à plusieurs organismes'},
+    {t:'Validez et confirmez',d:'Vous recevrez une confirmation par email'},
+  ]},
+  {title:'Impôts',url:'https://www.impots.gouv.fr',steps:[
+    {t:'Connectez-vous à impots.gouv.fr',d:'Espace Particulier → Mon profil'},
+    {t:'Rubrique "Coordonnées"',d:'Modifier votre adresse postale'},
+    {t:'Enregistrer',d:'Prise en compte immédiate'},
+  ]},
+  {title:'Ameli — Sécurité sociale',url:'https://www.ameli.fr',steps:[
+    {t:'Connectez-vous sur ameli.fr',d:'Mon compte → Mes informations'},
+    {t:'Modifiez votre adresse',d:'Section "Mes informations personnelles"'},
+    {t:'Optionnel : médecin traitant',d:'Déclarez-en un nouveau près de chez vous'},
+  ]},
+  {title:'CAF',url:'https://www.caf.fr',steps:[
+    {t:'Connectez-vous sur caf.fr',d:'Mon compte → Mes données personnelles'},
+    {t:'Déclarez le changement de situation',d:'"Je déménage" dans la rubrique Événements de vie'},
+    {t:'Indiquez votre nouvelle adresse et loyer',d:'Peut modifier le montant de vos aides'},
+  ]},
+  {title:'Carte grise',url:'https://immatriculation.ants.gouv.fr',steps:[
+    {t:'Connectez-vous sur ants.gouv.fr',d:'Rubrique "Véhicules"'},
+    {t:'Déclarez le changement d\'adresse',d:'Gratuit, immédiat en ligne'},
+    {t:'Téléchargez l\'accusé de réception',d:'Valable jusqu\'à réception du certificat'},
+  ]},
+  {title:'Permis de conduire',url:'https://permisdeconduire.ants.gouv.fr',steps:[
+    {t:'Connectez-vous sur ants.gouv.fr',d:'Rubrique "Permis de conduire"'},
+    {t:'Demandez la mise à jour d\'adresse',d:'Optionnel mais recommandé'},
+  ]},
+  {title:'Banque',url:'https://www.service-public.fr',steps:[
+    {t:'Connectez-vous à votre espace bancaire',d:'Application mobile ou site web'},
+    {t:'Rubrique "Mes informations"',d:'Modifier votre adresse postale'},
+    {t:'Confirmez avec votre code',d:'Prise en compte sous 24-48h'},
+  ]},
+  {title:'Assurance habitation',url:'https://www.service-public.fr',steps:[
+    {t:'Résiliez votre ancienne assurance',d:'Par lettre recommandée ou en ligne selon contrat'},
+    {t:'Comparez les offres',d:'Lesfurets, Assurland pour trouver le meilleur prix'},
+    {t:'Souscrivez le nouveau contrat',d:'Avant d\'emménager — obligatoire dès J1'},
+  ]},
+  {title:'Énergie',url:'https://www.edf.fr',steps:[
+    {t:'Résiliez l\'ancien contrat',d:'Donnez votre index de compteur final'},
+    {t:'Ouvrez un contrat à la nouvelle adresse',d:'EDF, Engie, Total Énergie ou autre'},
+    {t:'Planifiez l\'activation',d:'Demandez l\'activation pour votre date d\'emménagement'},
+  ]},
+  {title:'Box Internet',url:'https://www.service-public.fr',steps:[
+    {t:'Vérifiez la fibre à la nouvelle adresse',d:'Sur le site de votre opérateur ou degrouptest.com'},
+    {t:'Demandez le transfert ou résiliez',d:'Certains opérateurs proposent le transfert gratuit'},
+    {t:'Planifiez l\'installation',d:'Comptez 2 à 4 semaines pour un technicien'},
+  ]},
+  {title:'La Poste — Réexpédition',url:'https://www.laposte.fr/courrier-colis/nos-solutions-courrier-colis/faire-suivre-son-courrier',steps:[
+    {t:'Rendez-vous sur laposte.fr',d:'Rubrique "Faire suivre mon courrier"'},
+    {t:'Choisissez la durée',d:'6 mois (~26€) ou 12 mois (~48€)'},
+    {t:'Activez dès maintenant',d:'Idéalement 3 jours avant l\'emménagement'},
+  ]},
+  {title:'Liste électorale',url:'https://www.service-public.fr/particuliers/vosdroits/R49114',steps:[
+    {t:'Connectez-vous sur service-public.fr',d:'Avec France Connect'},
+    {t:'Demande d\'inscription',d:'Renseignez votre nouvelle commune'},
+    {t:'Délai',d:'À faire avant le 31 décembre pour voter l\'année suivante'},
+  ]},
+  {title:'Médecin traitant',url:'https://www.ameli.fr',steps:[
+    {t:'Trouvez un médecin',d:'Doctolib, Ameli ou recommandation de voisins'},
+    {t:'Déclarez-le sur ameli.fr',d:'Mon compte → Mon médecin traitant'},
+    {t:'Confirmé lors de la 1ère consultation',d:'Le médecin signe le formulaire Cerfa'},
+  ]},
+  {title:'Employeur / École',url:'#',steps:[
+    {t:'Rédigez un email simple',d:'"Je vous informe de mon changement d\'adresse..."'},
+    {t:'Envoyez au service RH ou à l\'administration',d:'Important pour vos fiches de paie et courriers'},
+  ]},
+];
+
+let userAddr = '', userDate = '', userSit = '';
+let initialized = false;
+
+function initAdmin() {
+  userAddr = document.getElementById('new-addr').value.trim();
+  userDate = document.getElementById('move-date').value;
+  userSit  = document.getElementById('situation').value;
+  if(!userAddr){ alert('Veuillez renseigner votre nouvelle adresse.'); return; }
+
+  document.getElementById('setup-card').style.display = 'none';
+  document.getElementById('orgs-wrap').style.display = 'block';
+  document.getElementById('sidebar').style.display = 'flex';
+
+  const dateLabel = userDate ? new Date(userDate).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '—';
+  document.getElementById('ic-addr').textContent = userAddr;
+  document.getElementById('ic-date').textContent = dateLabel;
+  document.getElementById('ic-sit').textContent = userSit;
+  initialized = true;
+  updateProgress();
+}
+
+function toggleDone(id) {
+  if(!initialized) return;
+  const card = document.querySelector(`.org-card[data-id="${id}"]`);
+  const check = document.querySelector(`.org-check[data-id="${id}"]`);
+  if(done.has(id)) {
+    done.delete(id);
+    card?.classList.remove('done');
+    check?.classList.remove('checked');
+  } else {
+    done.add(id);
+    card?.classList.add('done');
+    check?.classList.add('checked');
+    showNotif('✅ ' + ORGS[id].title + ' — marqué comme fait');
+  }
+  updateProgress();
+  updateQuick();
+}
+
+function updateProgress() {
+  const n = done.size, pct = Math.round(n/TOTAL*100);
+  const circ = 2*Math.PI*42;
+  const offset = circ - (circ * pct/100);
+  document.getElementById('ring-fill').style.strokeDashoffset = offset;
+  document.getElementById('ring-pct').textContent = pct+'%';
+  document.getElementById('ring-sub').textContent = n+' / '+TOTAL+' démarches';
+  document.getElementById('ic-prog').textContent = n+' / '+TOTAL;
+}
+
+function updateQuick() {
+  [0,1,7,4,10].forEach(id => {
+    const tick = document.getElementById('qt'+id);
+    const name = document.getElementById('qn'+id);
+    if(!tick) return;
+    if(done.has(id)) { tick.classList.add('on'); name?.classList.add('done-txt'); }
+    else { tick.classList.remove('on'); name?.classList.remove('done-txt'); }
+  });
+}
+
+let currentUrl = '#';
+function openModal(id) {
+  if(!initialized) { alert('Renseignez d\'abord votre nouvelle adresse.'); return; }
+  currentModalId = id;
+  const org = ORGS[id];
+  currentUrl = org.url;
+  document.getElementById('modal-title').textContent = org.title;
+  document.getElementById('modal-desc').textContent = 'Suivez ces étapes pour effectuer votre changement d\'adresse.';
+  const steps = document.getElementById('modal-steps');
+  steps.innerHTML = '';
+  org.steps.forEach((s,i) => {
+    const div = document.createElement('div');
+    div.className = 'ms';
+    div.innerHTML = `<div class="ms-num">${i+1}</div><div class="ms-txt"><b>${s.t}</b>${s.d}</div>`;
+    steps.appendChild(div);
+  });
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function goToSite() {
+  if(currentUrl && currentUrl !== '#') window.open(currentUrl, '_blank');
+  closeModal();
+}
+
+function markDoneFromModal() {
+  if(currentModalId !== null) toggleDone(currentModalId);
+  closeModal();
+}
+
+function showNotif(txt) {
+  const n = document.getElementById('notif');
+  document.getElementById('notif-txt').textContent = txt;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+// Init date min
+document.getElementById('move-date').min = new Date().toISOString().split('T')[0];
+// Init ring
+document.getElementById('ring-fill').style.strokeDasharray = '264';
+document.getElementById('ring-fill').style.strokeDashoffset = '264';
+</script>
+</body>
+</html>

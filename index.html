@@ -3,222 +3,347 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>NidoSync — Stockage Intelligent</title>
+<title>NidoSync — Votre emménagement, on s'en charge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --black:#111110;--white:#FAFAF8;--off:#F3F1EC;
-  --orange:#E05A1A;--orange-dim:#FEF0E8;
-  --teal:#17907A;--teal-dim:#E2F5F0;
-  --purple:#6B4FBB;--purple-dim:#F0ECFF;
-  --muted:#82807A;--border:#E4E1DA;
+  --black:#111110;
+  --white:#FAFAF8;
+  --off:#F3F1EC;
+  --orange:#E05A1A;
+  --orange-dim:#FEF0E8;
+  --teal:#17907A;
+  --teal-dim:#E2F5F0;
+  --muted:#82807A;
+  --border:#E4E1DA;
   --serif:'Instrument Serif',Georgia,serif;
-  --sans:'DM Sans',system-ui,sans-serif;
-  --max:1140px;
+  --sans:'DM Sans','Inter',system-ui,sans-serif;
+  --max:1160px;
+  --pad:0 2.5rem;
 }
-html{font-size:16px}
-body{font-family:var(--sans);background:var(--off);color:var(--black);min-height:100vh}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--white);color:var(--black);line-height:1.6;overflow-x:hidden}
+.wrap{max-width:var(--max);margin:0 auto;padding:var(--pad)}
 
-/* NAV */
+/* ── NAV ── */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:300;
-  background:rgba(250,250,248,.92);backdrop-filter:blur(18px);
+  background:rgba(250,250,248,.88);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 2.5rem;height:60px;
 }
-.logo{font-family:var(--serif);font-size:1.3rem;color:var(--black);text-decoration:none}
+.nav-inner{
+  max-width:var(--max);margin:0 auto;padding:0 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+}
+.logo{font-family:var(--serif);font-size:1.4rem;color:var(--black);letter-spacing:-.3px}
 .logo em{color:var(--orange);font-style:italic}
-.nav-links{display:flex;align-items:center;gap:1.75rem}
+.nav-links{display:flex;align-items:center;gap:2.5rem}
 .nav-links a{font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .15s}
 .nav-links a:hover{color:var(--black)}
-.nav-links a.active{color:var(--orange);font-weight:600}
-.nav-cta{background:var(--black)!important;color:#fff!important;padding:.5rem 1.25rem;border-radius:100px;font-size:.8125rem!important;font-weight:600!important}
-.demo-badge{background:var(--orange-dim);color:var(--orange);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .75rem;border-radius:100px}
+.nav-cta{
+  background:var(--black)!important;color:#fff!important;
+  padding:.5rem 1.25rem;border-radius:100px;
+  font-size:.8125rem!important;font-weight:600!important;letter-spacing:.01em;
+}
 
-/* VIEW TOGGLE */
-.view-bar{
-  max-width:var(--max);margin:0 auto;
-  padding:5rem 2.5rem 0;
+/* ── HERO ── */
+.hero{
+  padding-top:120px;padding-bottom:0;
+  max-width:var(--max);margin:0 auto;padding-left:2.5rem;padding-right:2.5rem;
+}
+.hero-top{
+  display:grid;grid-template-columns:1fr 420px;gap:5rem;
+  align-items:end;padding-bottom:4rem;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--orange-dim);color:var(--orange);
+  font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:.35rem 1rem;border-radius:100px;margin-bottom:2.25rem;
+}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--orange);border-radius:50%}
+h1{
+  font-family:var(--serif);
+  font-size:4.75rem;line-height:1;letter-spacing:-2px;font-weight:400;
+  margin-bottom:1.75rem;
+}
+h1 em{color:var(--orange);font-style:italic}
+.hero-body{
+  font-size:1.0625rem;color:var(--muted);font-weight:300;
+  line-height:1.8;max-width:500px;margin-bottom:2.5rem;
+}
+.hero-cta-row{display:flex;align-items:center;gap:1.5rem}
+.btn-cta{
+  display:inline-flex;align-items:center;gap:.75rem;
+  background:var(--orange);color:#fff;
+  padding:.9375rem 2rem;border-radius:100px;
+  font-size:.9375rem;font-weight:600;text-decoration:none;
+  box-shadow:0 6px 28px rgba(224,90,26,.28);
+  transition:transform .2s,box-shadow .2s;
+}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(224,90,26,.38)}
+.btn-cta svg{flex-shrink:0;transition:transform .2s}
+.btn-cta:hover svg{transform:translateX(4px)}
+.hero-note{font-size:.8125rem;color:var(--muted);display:flex;align-items:center;gap:.5rem}
+.hero-note::before{content:'✓';color:var(--teal);font-weight:700}
+
+/* Hero right — card */
+.hero-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.09),0 8px 24px rgba(0,0,0,.05);
+  margin-bottom:-1px;
+}
+.hc-head{
+  padding:1.25rem 1.5rem;
+  border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:1rem;
 }
-.vb-left h1{font-family:var(--serif);font-size:2.25rem;font-weight:400;letter-spacing:-.5px;margin-bottom:.25rem}
-.vb-left p{font-size:.875rem;color:var(--muted);font-weight:300}
-.toggle-pills{display:flex;background:#fff;border:1px solid var(--border);border-radius:100px;padding:4px;gap:2px}
-.tp{padding:.5rem 1.25rem;border-radius:100px;border:none;font-family:var(--sans);font-size:.8125rem;font-weight:500;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s}
-.tp.on{background:var(--black);color:#fff;font-weight:600}
-
-/* MAIN */
-.main{max-width:var(--max);margin:0 auto;padding:1.5rem 2.5rem 4rem}
-
-/* ── CLIENT VIEW ── */
-.client-grid{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start}
-
-/* BOX CARD */
-.box-card{
-  background:#fff;border:1px solid var(--border);border-radius:20px;
-  overflow:hidden;margin-bottom:1.25rem;
-}
-.bc-head{
-  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.bc-title{font-size:.875rem;font-weight:600}
-.bc-meta{font-size:.75rem;color:var(--muted)}
-.bc-body{padding:1.25rem 1.5rem}
-
-/* STORAGE STATS */
-.storage-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1.25rem}
-.ss-item{background:#fff;padding:1.25rem 1rem;text-align:center}
-.ss-num{font-family:var(--serif);font-size:1.875rem;color:var(--black);line-height:1;margin-bottom:.2rem}
-.ss-num em{color:var(--orange);font-style:normal}
-.ss-lbl{font-size:.75rem;color:var(--muted)}
-
-/* CARTON GRID */
-.carton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.875rem}
-.carton{
-  background:#fff;border:1.5px solid var(--border);border-radius:14px;
-  padding:1.125rem;cursor:pointer;transition:all .2s;
-  display:flex;flex-direction:column;gap:.625rem;
-}
-.carton:hover{border-color:var(--orange);box-shadow:0 4px 16px rgba(224,90,26,.1);transform:translateY(-2px)}
-.carton.selected{border-color:var(--orange);background:var(--orange-dim)}
-.c-ico{font-size:1.75rem;display:block}
-.c-id{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.c-name{font-size:.875rem;font-weight:600;color:var(--black);line-height:1.3}
-.c-tag{
-  display:inline-block;align-self:flex-start;
+.hc-title{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hc-status{
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--teal-dim);color:var(--teal);
   font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  padding:.25rem .625rem;border-radius:100px;
+  padding:.3rem .75rem;border-radius:100px;
 }
-.c-tag.salon{background:var(--orange-dim);color:var(--orange)}
-.c-tag.chambre{background:var(--purple-dim);color:var(--purple)}
-.c-tag.cuisine{background:var(--teal-dim);color:var(--teal)}
-.c-tag.divers{background:var(--off);color:var(--muted)}
+.hc-dot{width:5px;height:5px;background:var(--teal);border-radius:50%;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hc-rows{padding:.75rem}
+.hc-row{
+  display:flex;align-items:center;gap:.875rem;
+  padding:.75rem 1rem;border-radius:12px;
+  transition:background .15s;margin-bottom:4px;
+}
+.hc-row:hover{background:var(--off)}
+.hc-ico{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.0625rem;flex-shrink:0;
+}
+.hc-ico.a{background:var(--orange-dim)}
+.hc-ico.b{background:var(--teal-dim)}
+.hc-ico.c{background:var(--off)}
+.hc-info{flex:1}
+.hc-name{font-size:.875rem;font-weight:600;color:var(--black)}
+.hc-sub{font-size:.725rem;color:var(--muted);margin-top:1px}
+.hc-tick{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.hc-tick.done{background:var(--teal)}
+.hc-tick.todo{background:var(--off);border:1.5px solid var(--border)}
+.hc-tick svg{width:10px;height:10px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.hc-tick.done svg{stroke:#fff}
+.hc-tick.todo svg{stroke:var(--border)}
+.hc-foot{
+  padding:1rem 1.5rem;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--off);
+}
+.hc-foot-txt{font-size:.75rem;color:var(--muted);line-height:1.5}
+.hc-foot-txt strong{color:var(--black);font-weight:600;display:block;font-size:.875rem}
+.hc-btn{
+  background:var(--orange);color:#fff;border:none;
+  padding:.5rem 1.125rem;border-radius:100px;
+  font-family:var(--sans);font-size:.8125rem;font-weight:600;
+  cursor:pointer;transition:opacity .15s;
+}
+.hc-btn:hover{opacity:.85}
 
-/* SIDEBAR CLIENT */
-.client-sidebar{display:flex;flex-direction:column;gap:1.25rem}
+/* ── STRIP beneath hero ── */
+.hero-strip{
+  border-top:1px solid var(--border);
+  background:var(--off);
+}
+.hero-strip-inner{
+  max-width:var(--max);margin:0 auto;padding:0 2.5rem;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  divide-x:1px solid var(--border);
+}
+.strip-item{
+  padding:1.625rem 2rem;
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;gap:1rem;
+}
+.strip-item:last-child{border-right:none}
+.strip-num{
+  font-family:var(--serif);font-size:2rem;font-weight:400;
+  color:var(--black);line-height:1;white-space:nowrap;
+}
+.strip-num em{color:var(--orange);font-style:normal}
+.strip-desc{font-size:.8125rem;color:var(--muted);line-height:1.45}
 
-/* ABONNEMENT */
-.abo-card{background:var(--black);border-radius:20px;padding:1.75rem}
-.abo-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.5rem}
-.abo-plan{font-family:var(--serif);font-size:1.75rem;color:#fff;margin-bottom:.25rem}
-.abo-price{display:flex;align-items:baseline;gap:.35rem;margin-bottom:1.25rem}
-.abo-amount{font-family:var(--serif);font-size:2.5rem;color:var(--orange);line-height:1}
-.abo-period{font-size:.875rem;color:rgba(255,255,255,.35)}
-.abo-features{display:flex;flex-direction:column;gap:.625rem;margin-bottom:1.5rem}
-.abo-feat{display:flex;align-items:center;gap:.625rem;font-size:.8125rem;color:rgba(255,255,255,.65)}
-.abo-feat::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0}
-.abo-renew{font-size:.75rem;color:rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.08);padding-top:1rem}
+/* ── MARQUEE ── */
+.mq{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:.8rem 0}
+.mq-track{display:flex;gap:2.5rem;width:max-content;animation:scroll 24s linear infinite}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.mq-item{
+  display:flex;align-items:center;gap:.625rem;
+  font-size:.8125rem;font-weight:500;color:var(--muted);white-space:nowrap;
+}
+.mq-dot{color:var(--orange);font-size:.5rem}
 
-/* LIVRAISON CARD */
-.livraison-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden}
-.lc-head{padding:1.125rem 1.375rem;border-bottom:1px solid var(--border)}
-.lc-title{font-size:.875rem;font-weight:600;margin-bottom:.2rem}
-.lc-sub{font-size:.75rem;color:var(--muted)}
-.lc-body{padding:1.125rem 1.375rem;display:flex;flex-direction:column;gap:.875rem}
-.lc-selected{
-  background:var(--orange-dim);border:1.5px solid var(--orange);
-  border-radius:10px;padding:.875rem 1rem;
-  display:none;
+/* ── SECTIONS ── */
+section{padding:6rem 0}
+.section-wrap{max-width:var(--max);margin:0 auto;padding:0 2.5rem}
+.eyebrow{
+  font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--orange);margin-bottom:1rem;
 }
-.lc-sel-label{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--orange);margin-bottom:.375rem}
-.lc-sel-items{font-size:.875rem;font-weight:600;color:var(--black)}
-.fg{display:flex;flex-direction:column;gap:.375rem}
-.fg label{font-size:.675rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.fg input,.fg select{
-  padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:10px;
-  font-family:var(--sans);font-size:.875rem;color:var(--black);background:#fff;
-  outline:none;transition:border-color .15s;
+h2{
+  font-family:var(--serif);
+  font-size:3rem;font-weight:400;letter-spacing:-.75px;line-height:1.08;
+  margin-bottom:1rem;
 }
-.fg input:focus,.fg select:focus{border-color:var(--orange)}
-.btn-livrer{
-  width:100%;padding:.875rem;background:var(--orange);color:#fff;border:none;
-  border-radius:100px;font-family:var(--sans);font-size:.875rem;font-weight:600;
-  cursor:pointer;transition:opacity .2s;
-}
-.btn-livrer:hover{opacity:.85}
-.btn-livrer:disabled{opacity:.4;cursor:not-allowed}
+.sec-sub{font-size:1rem;color:var(--muted);font-weight:300;line-height:1.75;max-width:520px;margin-bottom:3.5rem}
 
-/* QR MODAL */
-.qr-modal{
-  display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(0,0,0,.5);backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;
+/* SERVICES */
+.srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.srv-cell{
+  background:var(--white);padding:2.25rem 2rem;
+  display:flex;flex-direction:column;gap:.875rem;
+  transition:background .2s;
 }
-.qr-modal.open{display:flex}
-.qr-box{
-  background:#fff;border-radius:24px;padding:2.5rem;
-  max-width:340px;width:90%;text-align:center;
-  box-shadow:0 24px 64px rgba(0,0,0,.2);
+.srv-cell:hover{background:var(--off)}
+.srv-ico{font-size:1.5rem;display:block}
+.srv-cell h3{font-size:1rem;font-weight:600;line-height:1.35}
+.srv-cell p{font-size:.875rem;color:var(--muted);line-height:1.7;flex:1}
+.srv-pill{
+  align-self:flex-start;
+  font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:.3rem .75rem;border-radius:100px;margin-top:.25rem;
 }
-.qr-box h3{font-family:var(--serif);font-size:1.5rem;font-weight:400;margin-bottom:.375rem}
-.qr-box p{font-size:.8125rem;color:var(--muted);margin-bottom:1.5rem}
-#qr-canvas{display:flex;justify-content:center;margin-bottom:1.25rem}
-.qr-id{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem}
-.btn-close-qr{width:100%;padding:.875rem;background:var(--black);color:#fff;border:none;border-radius:100px;font-family:var(--sans);font-size:.875rem;font-weight:600;cursor:pointer}
+.srv-pill.t{background:var(--teal-dim);color:var(--teal)}
+.srv-pill.o{background:var(--orange-dim);color:var(--orange)}
+.srv-pill.n{background:var(--off);color:var(--muted)}
 
-/* ── ENTREPÔT VIEW ── */
-.entrepot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
-.ent-stat{background:#fff;border:1px solid var(--border);border-radius:16px;padding:1.5rem}
-.ent-stat-num{font-family:var(--serif);font-size:2.5rem;font-weight:400;line-height:1;margin-bottom:.25rem}
-.ent-stat-num em{color:var(--orange);font-style:normal}
-.ent-stat-lbl{font-size:.8125rem;color:var(--muted)}
-.ent-table-wrap{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:1.25rem}
-.et-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.et-title{font-size:.875rem;font-weight:600}
-.et-search{
-  padding:.5rem 1rem;border:1.5px solid var(--border);border-radius:100px;
-  font-family:var(--sans);font-size:.8125rem;color:var(--black);outline:none;width:200px;
-  transition:border-color .15s;
+/* HOW */
+.how-bg{background:var(--black);padding:6rem 0}
+.how-bg h2{color:#fff}
+.how-bg .eyebrow{color:var(--orange)}
+.how-bg .sec-sub{color:rgba(255,255,255,.38)}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:20px;overflow:hidden;margin-top:3rem}
+.step-cell{padding:2.5rem 2rem;background:var(--black)}
+.step-n{
+  font-family:var(--serif);font-size:2.5rem;font-weight:400;
+  color:rgba(255,255,255,.12);line-height:1;margin-bottom:1.5rem;
 }
-.et-search:focus{border-color:var(--orange)}
-table{width:100%;border-collapse:collapse}
-th{padding:.875rem 1.25rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:var(--off)}
-td{padding:.875rem 1.25rem;font-size:.875rem;border-bottom:1px solid var(--off)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--off)}
-.td-id{font-weight:700;font-size:.8rem;letter-spacing:.04em;color:var(--muted)}
-.td-client{font-weight:600}
-.td-tag{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.25rem .625rem;border-radius:100px}
-.td-statut{display:inline-flex;align-items:center;gap:.375rem;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:100px}
-.td-statut.stocke{background:var(--teal-dim);color:var(--teal)}
-.td-statut.livraison{background:var(--orange-dim);color:var(--orange)}
-.td-statut.entrant{background:var(--purple-dim);color:var(--purple)}
-.td-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
-.btn-action{padding:.375rem .875rem;border:1.5px solid var(--border);border-radius:100px;background:#fff;font-family:var(--sans);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s}
-.btn-action:hover{border-color:var(--orange);color:var(--orange)}
+.step-cell.hi .step-n{color:var(--orange)}
+.step-cell h3{font-size:.9375rem;font-weight:600;color:#fff;margin-bottom:.5rem;line-height:1.35}
+.step-cell p{font-size:.8125rem;color:rgba(255,255,255,.38);line-height:1.7}
+.step-cell.hi{background:#1A1A18}
 
-/* NOTIF */
-.notif{
-  position:fixed;bottom:2rem;right:2rem;z-index:600;
-  background:var(--black);color:#fff;
-  padding:1rem 1.5rem;border-radius:14px;
-  font-size:.875rem;font-weight:500;
-  display:flex;align-items:center;gap:.75rem;
-  box-shadow:0 8px 24px rgba(0,0,0,.2);
-  transform:translateY(100px);opacity:0;
-  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+/* FORM */
+.form-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;
+  max-width:var(--max);margin:0 auto;padding:6rem 2.5rem;
 }
-.notif.show{transform:translateY(0);opacity:1}
-.notif-ico{font-size:1.125rem}
+.form-l .sec-sub{margin-bottom:2.5rem}
+.perks{display:flex;flex-direction:column;gap:1.5rem}
+.perk{display:flex;gap:1rem;align-items:flex-start}
+.perk-ic{
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  background:var(--orange-dim);
+  display:flex;align-items:center;justify-content:center;font-size:1.0625rem;
+  margin-top:2px;
+}
+.perk-tx b{display:block;font-size:.9375rem;font-weight:600;margin-bottom:.2rem}
+.perk-tx p{font-size:.8125rem;color:var(--muted);line-height:1.6}
 
+.form-card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:20px;padding:2.5rem;
+  box-shadow:0 20px 60px rgba(0,0,0,.06);
+}
+.form-card h3{font-family:var(--serif);font-size:1.875rem;font-weight:400;margin-bottom:.375rem}
+.form-card .fc-sub{font-size:.875rem;color:var(--muted);margin-bottom:2rem}
+.fg{margin-bottom:1.125rem}
+.fg label{
+  display:block;font-size:.675rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.4375rem;
+}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:.8125rem 1rem;
+  border:1.5px solid var(--border);border-radius:10px;
+  font-family:var(--sans);font-size:.9375rem;color:var(--black);
+  background:#fff;outline:none;appearance:none;-webkit-appearance:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{
+  border-color:var(--orange);box-shadow:0 0 0 3px rgba(224,90,26,.1);
+}
+.fg textarea{resize:vertical;min-height:80px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.4rem}
+.ck{
+  display:flex;align-items:center;gap:.625rem;
+  padding:.625rem .875rem;border:1.5px solid var(--border);border-radius:10px;
+  cursor:pointer;font-size:.875rem;transition:all .15s;user-select:none;
+}
+.ck:hover{border-color:rgba(224,90,26,.35);background:var(--orange-dim)}
+.ck.on{border-color:var(--orange);background:var(--orange-dim);color:var(--orange);font-weight:600}
+.ck input{display:none}
+.submit-btn{
+  width:100%;margin-top:1.375rem;
+  padding:1rem;background:var(--orange);color:#fff;border:none;
+  border-radius:100px;font-family:var(--sans);font-size:.9375rem;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.75rem;
+  box-shadow:0 4px 24px rgba(224,90,26,.25);
+  transition:transform .2s,box-shadow .2s;
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(224,90,26,.35)}
+.fn{text-align:center;font-size:.75rem;color:var(--muted);margin-top:.875rem}
+.success{display:none;text-align:center;padding:2rem 1rem}
+.success .sico{font-size:2.5rem;margin-bottom:1rem}
+.success h3{font-family:var(--serif);font-size:2rem;font-weight:400;margin-bottom:.5rem}
+.success p{font-size:.9rem;color:var(--muted)}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);
+  padding:2rem 0;
+}
+.foot-inner{
+  max-width:var(--max);margin:0 auto;padding:0 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.foot-inner .logo{font-size:1.2rem}
+.foot-inner p{font-size:.8rem;color:var(--muted)}
+.foot-links{display:flex;gap:2rem}
+.foot-links a{font-size:.8rem;color:var(--muted);text-decoration:none;transition:color .15s}
+.foot-links a:hover{color:var(--black)}
+
+/* MOBILE */
 @media(max-width:960px){
-  .client-grid{grid-template-columns:1fr}
-  .entrepot-grid{grid-template-columns:1fr 1fr}
-  nav{padding:0 1.25rem}
-  .view-bar,.main{padding-left:1.25rem;padding-right:1.25rem}
-  .carton-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .hero-top{grid-template-columns:1fr;gap:2.5rem}
+  h1{font-size:3rem;letter-spacing:-1px}
+  .hero-card{display:none}
+  .hero-strip-inner{grid-template-columns:1fr 1fr}
+  .strip-item:nth-child(2){border-right:none}
+  .strip-item:nth-child(3){border-right:1px solid var(--border)}
+  .srv-grid{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr 1fr}
+  .form-wrap{grid-template-columns:1fr;gap:3rem;padding:4rem 1.5rem}
+  .nav-links a:not(.nav-cta){display:none}
+  .wrap,.section-wrap,.nav-inner,.foot-inner{padding-left:1.5rem;padding-right:1.5rem}
+  .hero{padding-left:1.5rem;padding-right:1.5rem}
+  section{padding:4rem 0}
 }
 @media(max-width:600px){
-  .entrepot-grid{grid-template-columns:1fr}
-  .storage-stats{grid-template-columns:1fr}
-  .nav-links a:not(.nav-cta):not(.active){display:none}
+  .hero-strip-inner{grid-template-columns:1fr}
+  .strip-item{border-right:none!important;border-bottom:1px solid var(--border)}
+  .steps-row{grid-template-columns:1fr}
+  .row2{grid-template-columns:1fr}
+  .checks{grid-template-columns:1fr}
+  h2{font-size:2.25rem}
+  .foot-inner{flex-direction:column;gap:1rem;text-align:center}
 }
 </style>
 </head>
@@ -226,335 +351,339 @@ tr:hover td{background:var(--off)}
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo">Nido<em>Sync</em></a>
-  <div class="nav-links">
-    <a href="index.html">Accueil</a>
-    <a href="inventaire.html">✨ Inventaire IA</a>
-    <a href="suivi.html">🚚 Suivi GPS</a>
-    <a href="stockage.html" class="active">📦 Stockage</a>
-    <span class="demo-badge">✦ Démo</span>
-    <a href="index.html#contact" class="nav-cta">Être rappelé →</a>
+  <div class="nav-inner">
+    <div class="logo">Nido<em>Sync</em></div>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#comment">Comment ça marche</a>
+      <a href="inventaire.html">✨ Inventaire IA</a>
+      <a href="suivi.html">🚚 Suivi GPS</a>
+      <a href="stockage.html">📦 Stockage</a>
+      <a href="admin.html">📋 Démarches</a>
+      <a href="#contact" class="nav-cta">Être rappelé →</a>
+    </div>
   </div>
 </nav>
 
-<!-- HEADER + TOGGLE -->
-<div class="view-bar">
-  <div class="vb-left">
-    <h1>Stockage <em style="font-style:italic;color:var(--orange)">intelligent</em></h1>
-    <p>Inventaire QR · Livraison à la demande · Abonnement mensuel</p>
-  </div>
-  <div class="toggle-pills">
-    <button class="tp on" onclick="setView('client',this)">📦 Vue client</button>
-    <button class="tp" onclick="setView('entrepot',this)">🏭 Entrepôt</button>
-  </div>
-</div>
-
-<div class="main">
-
-  <!-- ── CLIENT VIEW ── -->
-  <div id="client-view">
-    <div class="client-grid">
-      <div>
-        <!-- Stats -->
-        <div class="storage-stats">
-          <div class="ss-item">
-            <div class="ss-num"><em>12</em></div>
-            <div class="ss-lbl">Cartons stockés</div>
-          </div>
-          <div class="ss-item">
-            <div class="ss-num"><em>8.4</em>m³</div>
-            <div class="ss-lbl">Volume occupé</div>
-          </div>
-          <div class="ss-item">
-            <div class="ss-num"><em>3</em></div>
-            <div class="ss-lbl">Livraisons ce mois</div>
-          </div>
-        </div>
-
-        <!-- Cartons -->
-        <div class="box-card">
-          <div class="bc-head">
-            <span class="bc-title">Mes cartons & objets</span>
-            <span class="bc-meta">Box B-14 · Entrepôt Paris 19e</span>
-          </div>
-          <div class="bc-body">
-            <p style="font-size:.8125rem;color:var(--muted);margin-bottom:1rem">Cliquez sur un carton pour le sélectionner et commander sa livraison</p>
-            <div class="carton-grid" id="carton-grid"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="client-sidebar">
-
-        <!-- Abonnement -->
-        <div class="abo-card">
-          <div class="abo-label">Mon abonnement</div>
-          <div class="abo-plan">Box Premium</div>
-          <div class="abo-price">
-            <div class="abo-amount">49</div>
-            <div class="abo-period">€ / mois</div>
-          </div>
-          <div class="abo-features">
-            <div class="abo-feat">Jusqu'à 10m³ de stockage</div>
-            <div class="abo-feat">3 livraisons incluses / mois</div>
-            <div class="abo-feat">Accès inventaire 24/7</div>
-            <div class="abo-feat">Assurance 5 000€ incluse</div>
-          </div>
-          <div class="abo-renew">Prochain prélèvement : 15 juillet 2026</div>
-        </div>
-
-        <!-- Livraison -->
-        <div class="livraison-card">
-          <div class="lc-head">
-            <div class="lc-title">Commander une livraison</div>
-            <div class="lc-sub">Recevez vos affaires chez vous</div>
-          </div>
-          <div class="lc-body">
-            <div class="lc-selected" id="lc-selected">
-              <div class="lc-sel-label">Articles sélectionnés</div>
-              <div class="lc-sel-items" id="lc-sel-items">—</div>
-            </div>
-            <div class="fg">
-              <label>Adresse de livraison</label>
-              <input type="text" placeholder="7 rue de la République, Lyon" id="lc-addr"/>
-            </div>
-            <div class="fg">
-              <label>Date souhaitée</label>
-              <input type="date" id="lc-date"/>
-            </div>
-            <div class="fg">
-              <label>Créneau</label>
-              <select id="lc-slot">
-                <option>Matin (8h–12h)</option>
-                <option>Après-midi (14h–18h)</option>
-                <option>Soirée (18h–20h)</option>
-              </select>
-            </div>
-            <button class="btn-livrer" id="btn-livrer" disabled onclick="commanderLivraison()">
-              Commander la livraison
-            </button>
-          </div>
-        </div>
-
-        <!-- QR -->
-        <div class="box-card" style="margin-bottom:0">
-          <div class="bc-head">
-            <span class="bc-title">Scanner un carton</span>
-            <span class="bc-meta">QR Code d'identification</span>
-          </div>
-          <div class="bc-body" style="text-align:center">
-            <p style="font-size:.8125rem;color:var(--muted);margin-bottom:1rem">Chaque carton a son QR Code unique. Scannez-le pour voir le contenu instantanément.</p>
-            <button onclick="showQR('NS-BOX-0847')" style="padding:.75rem 1.5rem;background:var(--off);border:1.5px solid var(--border);border-radius:100px;font-family:var(--sans);font-size:.875rem;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
-              📱 Générer un QR Code
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ── ENTREPÔT VIEW ── -->
-  <div id="entrepot-view" style="display:none">
-    <div class="entrepot-grid">
-      <div class="ent-stat">
-        <div class="ent-stat-num"><em>47</em></div>
-        <div class="ent-stat-lbl">Cartons en stock</div>
-      </div>
-      <div class="ent-stat">
-        <div class="ent-stat-num"><em>8</em></div>
-        <div class="ent-stat-lbl">Clients actifs</div>
-      </div>
-      <div class="ent-stat">
-        <div class="ent-stat-num"><em>3</em></div>
-        <div class="ent-stat-lbl">Livraisons demain</div>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="hero-badge">Conciergerie post-déménagement</div>
+      <h1>Vous venez<br/>d'emménager.<br/><em>On s'occupe<br/>du reste.</em></h1>
+      <p class="hero-body">Artisans, box internet, énergie, changement de serrure — tout ce qu'il faut pour être vraiment chez vous, sans passer vos soirées à chercher.</p>
+      <div class="hero-cta-row">
+        <a href="#contact" class="btn-cta">
+          Être rappelé gratuitement
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="9,4 13,8 9,12"/></svg>
+        </a>
+        <span class="hero-note">Réponse sous 2h · 100% gratuit</span>
       </div>
     </div>
 
-    <div class="ent-table-wrap">
-      <div class="et-head">
-        <span class="et-title">Inventaire entrepôt</span>
-        <input type="text" class="et-search" placeholder="Rechercher..." oninput="filterTable(this.value)"/>
+    <!-- Card -->
+    <div class="hero-card">
+      <div class="hc-head">
+        <span class="hc-title">Checklist emménagement</span>
+        <span class="hc-status"><span class="hc-dot"></span>En cours</span>
       </div>
-      <table id="ent-table">
-        <thead>
-          <tr>
-            <th>ID Carton</th>
-            <th>Client</th>
-            <th>Contenu</th>
-            <th>Box</th>
-            <th>Statut</th>
-            <th>Arrivée</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="ent-tbody"></tbody>
-      </table>
+      <div class="hc-rows">
+        <div class="hc-row">
+          <div class="hc-ico a">🔧</div>
+          <div class="hc-info">
+            <div class="hc-name">Plombier</div>
+            <div class="hc-sub">RDV confirmé — Mardi 10h00</div>
+          </div>
+          <div class="hc-tick done"><svg viewBox="0 0 10 10"><polyline points="2,5 4,8 8,2"/></svg></div>
+        </div>
+        <div class="hc-row">
+          <div class="hc-ico b">📡</div>
+          <div class="hc-info">
+            <div class="hc-name">Fibre Orange</div>
+            <div class="hc-sub">Installation Jeudi 14h–18h</div>
+          </div>
+          <div class="hc-tick done"><svg viewBox="0 0 10 10"><polyline points="2,5 4,8 8,2"/></svg></div>
+        </div>
+        <div class="hc-row">
+          <div class="hc-ico c">⚡</div>
+          <div class="hc-info">
+            <div class="hc-name">Contrat EDF</div>
+            <div class="hc-sub">Activation demain matin</div>
+          </div>
+          <div class="hc-tick todo"><svg viewBox="0 0 10 10"><polyline points="2,5 4,8 8,2"/></svg></div>
+        </div>
+        <div class="hc-row">
+          <div class="hc-ico c">🔐</div>
+          <div class="hc-info">
+            <div class="hc-name">Changement serrure</div>
+            <div class="hc-sub">Serrurier — en attente</div>
+          </div>
+          <div class="hc-tick todo"><svg viewBox="0 0 10 10"><polyline points="2,5 4,8 8,2"/></svg></div>
+        </div>
+      </div>
+      <div class="hc-foot">
+        <div class="hc-foot-txt">2 sur 4 confirmés<strong>Tout prêt vendredi</strong></div>
+        <button class="hc-btn">Voir détails</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- QR MODAL -->
-<div class="qr-modal" id="qr-modal" onclick="if(event.target===this)closeQR()">
-  <div class="qr-box">
-    <h3>QR Code carton</h3>
-    <p>Collez ce QR Code sur votre carton pour l'identifier instantanément</p>
-    <div id="qr-canvas"></div>
-    <div class="qr-id" id="qr-id-label">—</div>
-    <button class="btn-close-qr" onclick="closeQR()">Fermer</button>
+<!-- STRIP -->
+<div class="hero-strip">
+  <div class="hero-strip-inner">
+    <div class="strip-item">
+      <div class="strip-num"><em>14</em>h</div>
+      <div class="strip-desc">perdues en moyenne après un déménagement</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-num"><em>8</em>+</div>
+      <div class="strip-desc">démarches à gérer seul après un emménagement</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-num"><em>2</em>h</div>
+      <div class="strip-desc">délai de réponse garanti par notre équipe</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-num"><em>0</em>€</div>
+      <div class="strip-desc">de frais pour vous — nos partenaires nous rémunèrent</div>
+    </div>
   </div>
 </div>
 
-<!-- NOTIF -->
-<div class="notif" id="notif">
-  <span class="notif-ico">✅</span>
-  <span id="notif-txt">Action effectuée</span>
+<!-- MARQUEE -->
+<div class="mq">
+  <div class="mq-track">
+    <div class="mq-item"><span class="mq-dot">●</span>Artisans vérifiés</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Réponse sous 2h</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Box internet</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Contrat énergie</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Changement de serrure</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Stockage temporaire</div>
+    <div class="mq-item"><span class="mq-dot">●</span>100% gratuit pour vous</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Artisans vérifiés</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Réponse sous 2h</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Box internet</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Contrat énergie</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Changement de serrure</div>
+    <div class="mq-item"><span class="mq-dot">●</span>Stockage temporaire</div>
+    <div class="mq-item"><span class="mq-dot">●</span>100% gratuit pour vous</div>
+  </div>
 </div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-wrap">
+    <div class="eyebrow">Ce qu'on gère pour vous</div>
+    <h2>Tout ce dont vous avez besoin<br/>au bon moment</h2>
+    <p class="sec-sub">Un seul appel. Un interlocuteur dédié. On contacte les prestataires, on coordonne les rendez-vous — vous n'avez qu'à ouvrir la porte.</p>
+    <div class="srv-grid">
+      <div class="srv-cell">
+        <span class="srv-ico">🔧</span>
+        <h3>Artisans de confiance</h3>
+        <p>Électricien, plombier, peintre, serrurier — des pros vérifiés dans votre nouvelle ville, disponibles rapidement.</p>
+        <span class="srv-pill t">Dispo sous 48h</span>
+      </div>
+      <div class="srv-cell">
+        <span class="srv-ico">📡</span>
+        <h3>Box & téléphone</h3>
+        <p>Transfert ou nouvelle souscription chez Free, Orange, SFR, Bouygues. On compare les offres et on gère le technicien.</p>
+        <span class="srv-pill o">Le plus demandé</span>
+      </div>
+      <div class="srv-cell">
+        <span class="srv-ico">⚡</span>
+        <h3>Contrat énergie</h3>
+        <p>Ouverture de contrat EDF, Engie, Total Énergie. Mise en service garantie pour votre date d'entrée dans les lieux.</p>
+        <span class="srv-pill t">Activation J+1</span>
+      </div>
+      <div class="srv-cell">
+        <span class="srv-ico">🔐</span>
+        <h3>Changement de serrure</h3>
+        <p>Intervention d'un serrurier certifié dans les 48h. Parce qu'on ne sait jamais qui possède les anciennes clés.</p>
+        <span class="srv-pill n">Recommandé</span>
+      </div>
+      <div class="srv-cell">
+        <span class="srv-ico">📦</span>
+        <h3>Stockage temporaire</h3>
+        <p>Besoin de garder des affaires quelques semaines ? On vous trouve un box sécurisé à proximité de votre nouveau logement.</p>
+        <span class="srv-pill n">Sur demande</span>
+      </div>
+      <div class="srv-cell" style="border:1.5px dashed var(--border);background:transparent">
+        <span class="srv-ico">✨</span>
+        <h3>Et bien plus encore</h3>
+        <p>Assurance habitation, nettoyage, montage de meubles... Dites-nous ce dont vous avez besoin, on s'en occupe.</p>
+        <span class="srv-pill n">Sur mesure</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<div class="how-bg" id="comment">
+  <div class="section-wrap">
+    <div class="eyebrow">Comment ça marche</div>
+    <h2>Simple comme un appel</h2>
+    <p class="sec-sub">Pas d'application à installer, pas de formulaire interminable. On fait le travail pour vous.</p>
+    <div class="steps-row">
+      <div class="step-cell hi">
+        <div class="step-n">01</div>
+        <h3>Formulaire en 2 min</h3>
+        <p>Votre adresse, vos besoins, votre date d'emménagement. C'est tout.</p>
+      </div>
+      <div class="step-cell">
+        <div class="step-n">02</div>
+        <h3>On vous rappelle sous 2h</h3>
+        <p>Un conseiller dédié fait le point avec vous et prend tout en charge.</p>
+      </div>
+      <div class="step-cell">
+        <div class="step-n">03</div>
+        <h3>On coordonne tout</h3>
+        <p>Rendez-vous, devis, confirmations — vous recevez juste un récap clair.</p>
+      </div>
+      <div class="step-cell">
+        <div class="step-n">04</div>
+        <h3>Profitez de chez vous</h3>
+        <p>Sans stress, sans recherche, sans attente. Bienvenue chez vous.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="contact">
+  <div class="form-l">
+    <div class="eyebrow">Nous contacter</div>
+    <h2>On prend en charge votre emménagement</h2>
+    <p class="sec-sub">Laissez-nous vos coordonnées. Un conseiller vous rappelle dans les 2h ouvrées.</p>
+    <div class="perks">
+      <div class="perk">
+        <div class="perk-ic">🎯</div>
+        <div class="perk-tx">
+          <b>Service 100% gratuit</b>
+          <p>Nos partenaires nous rémunèrent à la commission — aucun frais pour vous.</p>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-ic">⚡</div>
+        <div class="perk-tx">
+          <b>Réponse sous 2h ouvrées</b>
+          <p>Un conseiller dédié vous rappelle rapidement pour cadrer vos besoins.</p>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-ic">🔒</div>
+        <div class="perk-tx">
+          <b>Données confidentielles</b>
+          <p>Aucun démarchage commercial, aucune revente de données.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="form-card">
+      <div id="fb">
+        <h3>Être rappelé gratuitement</h3>
+        <p class="fc-sub">Remplissez ce formulaire, on s'occupe du reste.</p>
+        <div class="row2">
+          <div class="fg"><label>Prénom</label><input type="text" id="prenom" placeholder="Marie"/></div>
+          <div class="fg"><label>Nom</label><input type="text" id="nom" placeholder="Dupont"/></div>
+        </div>
+        <div class="fg"><label>Téléphone</label><input type="tel" id="phone" placeholder="06 12 34 56 78"/></div>
+        <div class="row2">
+          <div class="fg"><label>Ville d'arrivée</label><input type="text" id="ville" placeholder="Paris, Lyon..."/></div>
+          <div class="fg"><label>Date d'emménagement</label><input type="date" id="date"/></div>
+        </div>
+        <div class="fg">
+          <label>Ce dont j'ai besoin</label>
+          <div class="checks">
+            <div class="ck" onclick="tog(this)"><input type="checkbox"/>🔧 Artisans</div>
+            <div class="ck" onclick="tog(this)"><input type="checkbox"/>📡 Box internet</div>
+            <div class="ck" onclick="tog(this)"><input type="checkbox"/>⚡ Énergie</div>
+            <div class="ck" onclick="tog(this)"><input type="checkbox"/>🔐 Serrure</div>
+            <div class="ck" onclick="tog(this)"><input type="checkbox"/>📦 Stockage</div>
+            <div class="ck" onclick="tog(this)"><input type="checkbox"/>✨ Autre</div>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="sub()">
+          Être rappelé gratuitement
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="9,4 13,8 9,12"/></svg>
+        </button>
+        <p class="fn">🔒 Données confidentielles · Aucun démarchage</p>
+      </div>
+      <div class="success" id="ok">
+        <div class="sico">🏠</div>
+        <h3>C'est noté !</h3>
+        <p>On vous rappelle dans les 2h ouvrées.<br/>Bienvenue dans votre nouveau chez-vous.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- INVENTAIRE CTA -->
+<div style="background:var(--black);padding:5rem 0">
+  <div style="max-width:var(--max);margin:0 auto;padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;gap:3rem;flex-wrap:wrap">
+    <div>
+      <div style="font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:.875rem">Nouveau · Outil déménageur</div>
+      <div style="font-family:var(--serif);font-size:2.25rem;font-weight:400;letter-spacing:-.5px;color:#fff;line-height:1.1;margin-bottom:.75rem">Estimez votre volume<br/><em style="font-style:italic;color:var(--orange)">en 30 secondes</em></div>
+      <div style="font-size:.9375rem;color:rgba(255,255,255,.45);font-weight:300;max-width:420px;line-height:1.7">Photographiez vos pièces. L'IA détecte les meubles, calcule le volume en m³ et génère un devis PDF instantanément.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start">
+      <a href="inventaire.html" style="display:inline-flex;align-items:center;gap:.75rem;background:var(--orange);color:#fff;padding:1rem 2rem;border-radius:100px;font-size:.9375rem;font-weight:600;text-decoration:none;box-shadow:0 4px 24px rgba(224,90,26,.3);white-space:nowrap;transition:opacity .2s">
+        ✨ Essayer l'inventaire IA
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="9,4 13,8 9,12"/></svg>
+      </a>
+      <span style="font-size:.8rem;color:rgba(255,255,255,.3);display:flex;align-items:center;gap:.4rem"><span style="color:var(--teal)">✓</span> Gratuit · Devis PDF inclus</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div class="logo">Nido<em>Sync</em></div>
+    <p>© 2026 NidoSync · Paris, France</p>
+    <div class="foot-links">
+      <a href="#">Confidentialité</a>
+      <a href="#">Mentions légales</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
 
 <script>
-// ── DATA DÉMO ──
-const CARTONS = [
-  {id:'NS-001',nom:'Vaisselle & cuisine',ico:'🍽️',tag:'cuisine',vol:0.8},
-  {id:'NS-002',nom:'Vêtements été',ico:'👗',tag:'chambre',vol:0.5},
-  {id:'NS-003',nom:'Livres & BD',ico:'📚',tag:'salon',vol:1.2},
-  {id:'NS-004',nom:'Électronique',ico:'💻',tag:'salon',vol:0.6},
-  {id:'NS-005',nom:'Linge de maison',ico:'🛏️',tag:'chambre',vol:0.9},
-  {id:'NS-006',nom:'Jouets enfants',ico:'🧸',tag:'divers',vol:0.7},
-  {id:'NS-007',nom:'Outils & bricolage',ico:'🔧',tag:'divers',vol:1.1},
-  {id:'NS-008',nom:'Décoration',ico:'🪴',tag:'salon',vol:0.6},
-  {id:'NS-009',nom:'Vêtements hiver',ico:'🧥',tag:'chambre',vol:0.8},
-  {id:'NS-010',nom:'Épicerie sèche',ico:'🥫',tag:'cuisine',vol:0.4},
-  {id:'NS-011',nom:'Produits ménagers',ico:'🧹',tag:'divers',vol:0.5},
-  {id:'NS-012',nom:'Affaires bureau',ico:'🖊️',tag:'salon',vol:0.6},
-];
-
-const ENTREPOT = [
-  {id:'NS-001',client:'Marie Dupont',contenu:'Vaisselle & cuisine',box:'A-03',statut:'stocke',date:'12 juin'},
-  {id:'NS-047',client:'Jean Martin',contenu:'Canapé 2 places',box:'B-14',statut:'livraison',date:'14 juin'},
-  {id:'NS-023',client:'Sarah B.',contenu:'Armoire penderie',box:'C-07',statut:'stocke',date:'10 juin'},
-  {id:'NS-089',client:'Ahmed K.',contenu:'Cartons livres ×4',box:'A-11',statut:'entrant',date:'Aujourd\'hui'},
-  {id:'NS-034',client:'Marie Dupont',contenu:'Vêtements été',box:'A-03',statut:'stocke',date:'12 juin'},
-  {id:'NS-056',client:'Lucas R.',contenu:'Matériel photo',box:'D-02',statut:'stocke',date:'8 juin'},
-  {id:'NS-078',client:'Jean Martin',contenu:'Vélo de route',box:'B-14',statut:'stocke',date:'14 juin'},
-  {id:'NS-091',client:'Camille T.',contenu:'Meubles bureau',box:'E-05',statut:'entrant',date:'Aujourd\'hui'},
-];
-
-let selectedCartons = new Set();
-
-// Render cartons
-function renderCartons() {
-  const grid = document.getElementById('carton-grid');
-  grid.innerHTML = '';
-  CARTONS.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'carton' + (selectedCartons.has(c.id) ? ' selected' : '');
-    div.innerHTML = `
-      <span class="c-ico">${c.ico}</span>
-      <div class="c-id">${c.id}</div>
-      <div class="c-name">${c.nom}</div>
-      <span class="c-tag ${c.tag}">${c.tag}</span>`;
-    div.onclick = () => toggleCarton(c.id, div);
-    grid.appendChild(div);
-  });
-}
-
-function toggleCarton(id, el) {
-  if(selectedCartons.has(id)) selectedCartons.delete(id);
-  else selectedCartons.add(id);
-  el.classList.toggle('selected');
-  updateLivraisonPanel();
-}
-
-function updateLivraisonPanel() {
-  const sel = document.getElementById('lc-selected');
-  const items = document.getElementById('lc-sel-items');
-  const btn = document.getElementById('btn-livrer');
-  if(selectedCartons.size > 0) {
-    sel.style.display = 'block';
-    const names = CARTONS.filter(c => selectedCartons.has(c.id)).map(c => c.nom);
-    items.textContent = names.join(', ');
-    btn.disabled = false;
-  } else {
-    sel.style.display = 'none';
-    btn.disabled = true;
+function tog(el){el.classList.toggle('on')}
+async function sub(){
+  const prenom=document.getElementById('prenom').value.trim();
+  const nom=document.getElementById('nom').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const ville=document.getElementById('ville').value.trim();
+  const date=document.getElementById('date').value;
+  if(!prenom||!phone||!ville){alert('Merci de renseigner votre prénom, téléphone et ville.');return;}
+  const checks=[...document.querySelectorAll('.ck.on')].map(el=>el.innerText.replace(/^./,'')).join(', ');
+  const btn=document.querySelector('.submit-btn');
+  btn.disabled=true;btn.textContent='Envoi en cours...';
+  try{
+    const res=await fetch('https://formspree.io/f/xqevlyww',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({prenom,nom,telephone:phone,ville,date_emmenagement:date,services:checks||'Non précisé'})
+    });
+    const data=await res.json();
+    if(res.ok){
+      document.getElementById('fb').style.display='none';
+      document.getElementById('ok').style.display='block';
+    } else {
+      alert('Une erreur est survenue : '+(data.error||'réessayez plus tard.'));
+      btn.disabled=false;btn.textContent='Être rappelé gratuitement';
+    }
+  } catch(e){
+    alert('Erreur réseau. Vérifiez votre connexion et réessayez.');
+    btn.disabled=false;btn.textContent='Être rappelé gratuitement';
   }
 }
-
-function commanderLivraison() {
-  const addr = document.getElementById('lc-addr').value.trim();
-  if(!addr) { showNotif('⚠️ Veuillez renseigner une adresse de livraison'); return; }
-  showNotif('✅ Livraison commandée ! Vous recevrez une confirmation par SMS.');
-  selectedCartons.clear();
-  renderCartons();
-  updateLivraisonPanel();
-  document.getElementById('lc-addr').value = '';
-}
-
-// Render entrepôt table
-function renderTable(data) {
-  const tbody = document.getElementById('ent-tbody');
-  tbody.innerHTML = '';
-  data.forEach(r => {
-    const statusMap = {stocke:'Stocké',livraison:'Livraison J+1',entrant:'Entrant aujourd\'hui'};
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="td-id">${r.id}</span></td>
-      <td><span class="td-client">${r.client}</span></td>
-      <td>${r.contenu}</td>
-      <td><span style="font-weight:600">${r.box}</span></td>
-      <td><span class="td-statut ${r.statut}"><span class="td-dot"></span>${statusMap[r.statut]}</span></td>
-      <td style="color:var(--muted);font-size:.8125rem">${r.date}</td>
-      <td><button class="btn-action" onclick="actionRow('${r.id}')">Gérer</button></td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function filterTable(q) {
-  const filtered = ENTREPOT.filter(r =>
-    r.id.toLowerCase().includes(q.toLowerCase()) ||
-    r.client.toLowerCase().includes(q.toLowerCase()) ||
-    r.contenu.toLowerCase().includes(q.toLowerCase())
-  );
-  renderTable(filtered);
-}
-
-function actionRow(id) { showNotif('📦 Carton '+id+' — action enregistrée'); }
-
-// QR Code
-function showQR(id) {
-  document.getElementById('qr-canvas').innerHTML = '';
-  document.getElementById('qr-id-label').textContent = id;
-  new QRCode(document.getElementById('qr-canvas'), {
-    text: 'https://nidosync.fr/stockage?id='+id,
-    width:160, height:160,
-    colorDark:'#111110', colorLight:'#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
-  });
-  document.getElementById('qr-modal').classList.add('open');
-}
-function closeQR() { document.getElementById('qr-modal').classList.remove('open'); }
-
-// View toggle
-function setView(v, btn) {
-  document.querySelectorAll('.tp').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('client-view').style.display = v === 'client' ? 'block' : 'none';
-  document.getElementById('entrepot-view').style.display = v === 'entrepot' ? 'block' : 'none';
-}
-
-// Notif
-function showNotif(txt) {
-  const n = document.getElementById('notif');
-  document.getElementById('notif-txt').textContent = txt;
-  n.classList.add('show');
-  setTimeout(() => n.classList.remove('show'), 3500);
-}
-
-// Init
-document.getElementById('lc-date').min = new Date().toISOString().split('T')[0];
-renderCartons();
-renderTable(ENTREPOT);
+document.getElementById('date').min=new Date().toISOString().split('T')[0];
 </script>
 </body>
 </html>
