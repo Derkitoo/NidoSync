@@ -369,7 +369,12 @@ async function startAnalysis() {
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Erreur serveur');
 
-    currentResult = { meubles: data.meubles, pieces: photos.length };
+    // Normalise field name: API returns volume_unitaire, renderer uses vol
+    const meubles = data.meubles.map(m => ({
+      ...m,
+      vol: parseFloat(m.volume_unitaire || m.vol || 0)
+    }));
+    currentResult = { meubles, pieces: photos.length };
     setTimeout(() => renderResults(currentResult), 400);
 
   } catch(err) {
