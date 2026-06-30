@@ -130,6 +130,10 @@ html,body{height:100%;font-family:var(--sans);background:var(--off);color:var(--
       <label>Votre nom</label>
       <input type="text" id="driver-name" placeholder="Karim M."/>
     </div>
+    <div class="fg">
+      <label>Adresse de destination</label>
+      <input type="text" id="dest-addr" placeholder="7 rue de la République, Lyon"/>
+    </div>
   </div>
 
   <div class="status-card">
@@ -233,6 +237,8 @@ let fb = {};
 let watchId = null;
 let sharing = false;
 let currentTruckId = '';
+let destLat = null;
+let destLng = null;
 
 document.getElementById('btn-toggle').addEventListener('click', function() {
   log('Clic sur le bouton détecté.');
@@ -240,9 +246,20 @@ document.getElementById('btn-toggle').addEventListener('click', function() {
   else stopSharing();
 });
 
-function startSharing() {
+async function geocodeAddress(address) {
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(address);
+  const res = await fetch(url, { headers: { 'Accept-Language': 'fr' } });
+  const data = await res.json();
+  if (data && data.length > 0) {
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), label: data[0].display_name };
+  }
+  return null;
+}
+
+async function startSharing() {
   const truckId = document.getElementById('truck-id').value.trim();
   const driverName = document.getElementById('driver-name').value.trim();
+  const destAddr = document.getElementById('dest-addr').value.trim();
 
   if (!truckId) {
     alert('Renseignez le numéro de camion.');
@@ -261,6 +278,23 @@ function startSharing() {
     log('Page chargée en ' + location.protocol + ' — la géolocalisation est bloquée hors HTTPS.', 'err');
     showError('Cette page doit être ouverte en HTTPS pour activer le GPS.');
     return;
+  }
+
+  // Géocode destination si fournie
+  if (destAddr) {
+    log('Géocodage de l\u2019adresse de destination...');
+    try {
+      const geo = await geocodeAddress(destAddr);
+      if (geo) {
+        destLat = geo.lat;
+        destLng = geo.lng;
+        log('Destination trouvée : ' + geo.label.slice(0,50), 'ok');
+      } else {
+        log('Adresse non trouvée, le trajet sera partagé sans destination.', 'err');
+      }
+    } catch (err) {
+      log('Erreur géocodage : ' + err.message, 'err');
+    }
   }
 
   document.getElementById('id-card').style.opacity = '0.5';
@@ -325,6 +359,9 @@ function onPosition(pos, truckId, driverName) {
         speed: speed || 0,
         driver: driverName || 'Chauffeur',
         truckId: truckId,
+        destLat: destLat,
+        destLng: destLng,
+        destAddr: document.getElementById('dest-addr').value.trim() || null,
         updatedAt: Date.now(),
         online: true
       }).then(() => {

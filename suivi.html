@@ -225,39 +225,18 @@ onValue(trucksRef, (snapshot) => {
       <div class="client-view" id="client-view">
         <div class="eta-card">
           <div class="eta-label">Arrivée estimée</div>
-          <div class="eta-time" id="eta-time">14h35</div>
-          <div class="eta-desc" id="eta-desc">Dans environ <strong style="color:#fff">47 minutes</strong> · 38 km restants</div>
+          <div class="eta-time" id="eta-time">—</div>
+          <div class="eta-desc" id="eta-desc">En attente de la position du chauffeur...</div>
           <div class="eta-status"><span class="eta-dot"></span> En route vers vous</div>
         </div>
 
         <div class="timeline">
-          <div class="tl-head">Étapes du déménagement</div>
+          <div class="tl-head">Statut du trajet</div>
           <div class="tl-item">
-            <div class="tl-ico done">✓</div>
+            <div class="tl-ico active" id="tl-status-ico">🚛</div>
             <div class="tl-info">
-              <div class="tl-name">Chargement terminé</div>
-              <div class="tl-time">08h30 · 15 rue Lepic, Paris 18e</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-ico active">🚛</div>
-            <div class="tl-info">
-              <div class="tl-name">En transit</div>
-              <div class="tl-time" id="tl-transit">Depuis 11h42 · A6 direction Lyon</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-ico todo">📦</div>
-            <div class="tl-info">
-              <div class="tl-name">Déchargement</div>
-              <div class="tl-time">Estimé 14h35 · 7 rue de la République, Lyon</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-ico todo">✅</div>
-            <div class="tl-info">
-              <div class="tl-name">Déménagement terminé</div>
-              <div class="tl-time">Estimé 17h00</div>
+              <div class="tl-name" id="tl-status-name">En attente de signal GPS</div>
+              <div class="tl-time" id="tl-status-detail">Le chauffeur n'a pas encore démarré le partage</div>
             </div>
           </div>
         </div>
@@ -265,8 +244,8 @@ onValue(trucksRef, (snapshot) => {
         <div class="truck-info">
           <div class="truck-ico">🚚</div>
           <div class="truck-txt">
-            <div class="truck-name">Camion AB-421-CD · 20m³</div>
-            <div class="truck-detail">Chauffeur : Karim M. · 06 12 34 56 78</div>
+            <div class="truck-name" id="truck-info-name">Aucun camion connecté</div>
+            <div class="truck-detail" id="truck-info-detail">En attente de connexion chauffeur</div>
           </div>
         </div>
       </div>
@@ -308,6 +287,9 @@ function createIcon(html, size) {
   return L.divIcon({html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2]});
 }
 
+let lastRoutedTruckKey = null;
+let lastRoutedPos = null;
+
 function renderLiveTruck(key) {
   const t = liveTrucksData[key];
   if(!t) return;
@@ -315,12 +297,84 @@ function renderLiveTruck(key) {
 
   if(truckMarker) map_el.removeLayer(truckMarker);
   truckMarker = L.marker(pos, {icon: createIcon(`<div class="truck-marker">🚚</div>`, 42)}).addTo(map_el);
-  map_el.setView(pos, 13);
 
   document.getElementById('speed-display').innerHTML = Math.round((t.speed||0)*3.6) + ' <span>km/h</span>';
 
   const secsAgo = Math.round((Date.now() - (t.updatedAt||Date.now()))/1000);
   document.querySelector('.mo-update').innerHTML = `<span class="mo-dot"></span> Mis à jour il y a ${secsAgo}s`;
+
+  // Truck info panel
+  const nameEl = document.getElementById('truck-info-name');
+  const detailEl = document.getElementById('truck-info-detail');
+  if(nameEl) nameEl.textContent = 'Camion ' + (t.truckId || key);
+  if(detailEl) detailEl.textContent = 'Chauffeur : ' + (t.driver || '—') + (t.online ? ' · En ligne' : ' · Hors ligne');
+
+  const statusName = document.getElementById('tl-status-name');
+  const statusDetail = document.getElementById('tl-status-detail');
+  if(statusName) statusName.textContent = t.online ? 'En transit' : 'Connexion perdue';
+  if(statusDetail) statusDetail.textContent = (Math.round((t.speed||0)*3.6)) + ' km/h · Précision ±' + Math.round(t.accuracy||0) + 'm';
+
+  // Destination + itinéraire réel
+  if(t.destLat && t.destLng) {
+    if(destMarker) map_el.removeLayer(destMarker);
+    destMarker = L.marker([t.destLat, t.destLng], {icon: createIcon('<div class="dest-marker">📍</div>', 36)}).addTo(map_el)
+      .bindTooltip((t.destAddr||'Destination').split(',')[0], {permanent:true, direction:'top', offset:[0,-18]});
+
+    // Ne recalcule l'itinéraire que si la position a significativement changé (évite de spammer OSRM)
+    const moved = !lastRoutedPos || haversine(pos, lastRoutedPos) > 0.3; // > 300m
+    if(key !== lastRoutedTruckKey || moved) {
+      lastRoutedTruckKey = key;
+      lastRoutedPos = pos;
+      fetchRoute(pos, [t.destLat, t.destLng]);
+    } else {
+      map_el.fitBounds(L.latLngBounds([pos, [t.destLat, t.destLng]]), {padding:[60,60]});
+    }
+  } else {
+    if(routeLine) { map_el.removeLayer(routeLine); routeLine = null; }
+    if(destMarker) { map_el.removeLayer(destMarker); destMarker = null; }
+    map_el.setView(pos, 13);
+    document.getElementById('eta-time').textContent = '—';
+    document.getElementById('eta-desc').textContent = 'Aucune destination renseignée par le chauffeur.';
+  }
+}
+
+function haversine([lat1,lng1],[lat2,lng2]) {
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function fetchRoute(from, to) {
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(data.code !== 'Ok' || !data.routes?.length) throw new Error('Pas d\u2019itinéraire trouvé');
+
+    const route = data.routes[0];
+    const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+
+    if(routeLine) map_el.removeLayer(routeLine);
+    routeLine = L.polyline(coords, {color:'#E05A1A', weight:4, opacity:.7}).addTo(map_el);
+    map_el.fitBounds(routeLine.getBounds(), {padding:[60,60]});
+
+    // ETA + distance
+    const durationMin = Math.round(route.duration / 60);
+    const distanceKm = (route.distance / 1000).toFixed(1);
+    const eta = new Date(Date.now() + route.duration*1000);
+    const etaLabel = eta.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+
+    document.getElementById('eta-time').textContent = etaLabel;
+    const durLabel = durationMin >= 60
+      ? Math.floor(durationMin/60)+'h'+String(durationMin%60).padStart(2,'0')
+      : durationMin+' min';
+    document.getElementById('eta-desc').innerHTML = `Dans environ <strong style="color:#fff">${durLabel}</strong> · ${distanceKm} km restants`;
+
+  } catch(err) {
+    console.warn('Erreur OSRM:', err.message);
+    document.getElementById('eta-desc').textContent = 'Calcul d\u2019itinéraire indisponible pour le moment.';
+  }
 }
 
 function renderFleetList() {
