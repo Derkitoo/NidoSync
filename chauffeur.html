@@ -268,7 +268,7 @@ function startSharing() {
 
   const btn = document.getElementById('btn-toggle');
   btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Demande d\\'autorisation...';
+  btn.innerHTML = "<span>⏳</span> Demande d'autorisation...";
 
   log('Appel de navigator.geolocation.watchPosition()...');
 
@@ -284,9 +284,9 @@ function startSharing() {
       },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
     );
-    log('watchPosition() appelé, ID=' + watchId + '. En attente de la réponse du navigateur (popup d\\'autorisation)...');
+    log("watchPosition() appelé, ID=" + watchId + ". En attente de la réponse du navigateur (popup d'autorisation)...");
   } catch (err) {
-    log('Exception lors de l\\'appel watchPosition : ' + err.message, 'err');
+    log("Exception lors de l'appel watchPosition : " + err.message, 'err');
     showError('Erreur technique : ' + err.message);
   }
 }
@@ -349,7 +349,7 @@ function onPosition(pos, truckId, driverName) {
 
 function onError(err) {
   const messages = {
-    1: 'Vous avez refusé l\\'accès à la localisation. Allez dans les réglages de Chrome → Site → Autorisations → Localisation, et autorisez ce site.',
+    1: "Vous avez refuse l'acces a la localisation. Allez dans les reglages de Chrome > Site > Autorisations > Localisation, et autorisez ce site.",
     2: 'Position indisponible. Vérifiez que le GPS est activé sur votre téléphone.',
     3: 'Délai dépassé pour obtenir la position. Réessayez dans un endroit avec meilleure réception.'
   };
@@ -390,7 +390,7 @@ function stopSharing() {
   orb.classList.remove('active','error','warn');
   orb.textContent = '📍';
   document.getElementById('status-title').textContent = 'Partage arrêté';
-  document.getElementById('status-desc').textContent = 'Votre position n\\'est plus visible.';
+  document.getElementById('status-desc').textContent = "Votre position n'est plus visible.";
   document.getElementById('live-data').classList.remove('show');
 
   document.getElementById('id-card').style.opacity = '1';
