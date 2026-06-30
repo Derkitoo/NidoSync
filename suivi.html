@@ -165,6 +165,32 @@ nav{
   nav{padding:0 1rem}
 }
 </style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCLuAhizDhYrSvyNq0dIkyunmbXpsf-5E",
+  authDomain: "nodosync-pro.firebaseapp.com",
+  databaseURL: "https://nodosync-pro-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "nodosync-pro",
+  storageBucket: "nodosync-pro.firebasestorage.app",
+  messagingSenderId: "673099902451",
+  appId: "1:673099902451:web:5cd27eb5ac04ce0cf77686"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const trucksRef = ref(db, 'trucks');
+
+window.__liveTrucks = {};
+
+onValue(trucksRef, (snapshot) => {
+  const data = snapshot.val() || {};
+  window.__liveTrucks = data;
+  if(window.onLiveTrucksUpdate) window.onLiveTrucksUpdate(data);
+});
+</script>
 </head>
 <body>
 
@@ -175,6 +201,7 @@ nav{
     <a href="inventaire.html" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none">✨ Inventaire IA</a>
     <a href="suivi.html" style="font-size:.875rem;font-weight:600;color:var(--orange);text-decoration:none">🚚 Suivi GPS</a>
     <a href="stockage.html" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none">📦 Stockage</a>
+    <a href="chauffeur.html" style="font-size:.875rem;font-weight:500;color:var(--teal);text-decoration:none">📍 Espace chauffeur</a>
     <a href="admin.html" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none">📋 Démarches</a>
     <div class="view-toggle">
       <button class="vt-btn active" onclick="setView('client')">👤 Client</button>
@@ -190,7 +217,7 @@ nav{
   <div class="sidebar">
     <div class="sb-head">
       <div class="sb-title" id="sb-title">Votre déménagement</div>
-      <div class="sb-sub" id="sb-sub">Commande #NS-2847 · Paris → Lyon</div>
+      <div class="sb-sub" id="sb-sub">Suivi en direct du chauffeur</div>
     </div>
     <div class="sb-scroll">
 
@@ -248,61 +275,7 @@ nav{
       <div class="fleet-view" id="fleet-view">
         <div class="fleet-head">
           <span class="fleet-title">Camions actifs</span>
-          <span class="fleet-badge">3 en route</span>
-        </div>
-
-        <div class="truck-card selected" onclick="selectTruck(this, 0)">
-          <div class="tc-head">
-            <div class="tc-ico">🚚</div>
-            <div class="tc-name">AB-421-CD</div>
-            <div class="tc-status en-route">En route</div>
-          </div>
-          <div class="tc-body">
-            <div class="tc-stat"><div class="tc-stat-val">87 km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">38 km</div><div class="tc-stat-lbl">Reste</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">14h35</div><div class="tc-stat-lbl">ETA</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">Paris→Lyon</div><div class="tc-stat-lbl">Trajet</div></div>
-          </div>
-          <div class="tc-progress">
-            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)"><span>Progression</span><span>68%</span></div>
-            <div class="tc-prog-bar"><div class="tc-prog-fill" style="width:68%"></div></div>
-          </div>
-        </div>
-
-        <div class="truck-card" onclick="selectTruck(this, 1)">
-          <div class="tc-head">
-            <div class="tc-ico">🚛</div>
-            <div class="tc-name">EF-892-GH</div>
-            <div class="tc-status chargement">Chargement</div>
-          </div>
-          <div class="tc-body">
-            <div class="tc-stat"><div class="tc-stat-val">0 km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">—</div><div class="tc-stat-lbl">Reste</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">16h00</div><div class="tc-stat-lbl">Départ</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">Paris→Marseille</div><div class="tc-stat-lbl">Trajet</div></div>
-          </div>
-          <div class="tc-progress">
-            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)"><span>Progression</span><span>12%</span></div>
-            <div class="tc-prog-bar"><div class="tc-prog-fill" style="width:12%"></div></div>
-          </div>
-        </div>
-
-        <div class="truck-card" onclick="selectTruck(this, 2)">
-          <div class="tc-head">
-            <div class="tc-ico">🚐</div>
-            <div class="tc-name">IJ-334-KL</div>
-            <div class="tc-status en-route">En route</div>
-          </div>
-          <div class="tc-body">
-            <div class="tc-stat"><div class="tc-stat-val">112 km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">14 km</div><div class="tc-stat-lbl">Reste</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">13h55</div><div class="tc-stat-lbl">ETA</div></div>
-            <div class="tc-stat"><div class="tc-stat-val">Orléans→Paris</div><div class="tc-stat-lbl">Trajet</div></div>
-          </div>
-          <div class="tc-progress">
-            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)"><span>Progression</span><span>91%</span></div>
-            <div class="tc-prog-bar"><div class="tc-prog-fill" style="width:91%"></div></div>
-          </div>
+          <span class="fleet-badge">0 en route</span>
         </div>
       </div>
 
@@ -321,107 +294,94 @@ nav{
 </div>
 
 <script>
-// ── DONNÉES DÉMO ──
-const TRUCKS = [
-  {
-    id:0, name:'AB-421-CD', emoji:'🚚',
-    // Trajet simulé Paris → Lyon (points intermédiaires A6)
-    route:[
-      [48.8566, 2.3522], // Paris
-      [48.5, 2.6],
-      [47.9, 3.0],
-      [47.3, 3.6],
-      [46.8, 4.2],
-      [46.3, 4.6],
-      [45.9, 4.75],
-      [45.748, 4.847]  // Lyon
-    ],
-    progress:0.68,
-    dest:[45.748, 4.847],
-    destLabel:'Lyon'
-  },
-  {
-    id:1, name:'EF-892-GH', emoji:'🚛',
-    route:[[48.87, 2.35],[48.87, 2.35]],
-    progress:0.12,
-    dest:[43.296, 5.369],
-    destLabel:'Marseille'
-  },
-  {
-    id:2, name:'IJ-334-KL', emoji:'🚐',
-    route:[
-      [47.903, 1.909], // Orléans
-      [48.1, 2.0],
-      [48.4, 2.15],
-      [48.7, 2.28],
-      [48.856, 2.352]  // Paris
-    ],
-    progress:0.91,
-    dest:[48.856, 2.352],
-    destLabel:'Paris'
-  }
-];
-
-let currentTruck = 0;
+// ── ÉTAT LIVE (Firebase) ──
+let liveTrucksData = {};
+let currentTruckKey = null;
 let map, truckMarker, destMarker, routeLine;
-let animFrame = 0;
 
-// Init map
-const map_el = L.map('map', {zoomControl:false, attributionControl:false});
+// Map init
+const map_el = L.map('map', {zoomControl:false, attributionControl:false}).setView([46.6, 2.5], 6);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {maxZoom:18}).addTo(map_el);
 L.control.zoom({position:'topright'}).addTo(map_el);
-
-function getTruckPos(truck) {
-  const r = truck.route;
-  const prog = Math.min(truck.progress, 0.999);
-  const total = r.length - 1;
-  const idx = Math.floor(prog * total);
-  const frac = (prog * total) - idx;
-  if(idx >= r.length - 1) return r[r.length-1];
-  const a = r[idx], b = r[idx+1];
-  return [a[0] + (b[0]-a[0])*frac, a[1] + (b[1]-a[1])*frac];
-}
 
 function createIcon(html, size) {
   return L.divIcon({html, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2]});
 }
 
-function renderTruck(truckIdx) {
-  const truck = TRUCKS[truckIdx];
-  const pos = getTruckPos(truck);
+function renderLiveTruck(key) {
+  const t = liveTrucksData[key];
+  if(!t) return;
+  const pos = [t.lat, t.lng];
+
   if(truckMarker) map_el.removeLayer(truckMarker);
-  if(destMarker) map_el.removeLayer(destMarker);
-  if(routeLine) map_el.removeLayer(routeLine);
+  truckMarker = L.marker(pos, {icon: createIcon(`<div class="truck-marker">🚚</div>`, 42)}).addTo(map_el);
+  map_el.setView(pos, 13);
 
-  truckMarker = L.marker(pos, {icon: createIcon(`<div class="truck-marker">${truck.emoji}</div>`, 42)}).addTo(map_el);
-  destMarker = L.marker(truck.dest, {icon: createIcon(`<div class="dest-marker">📍</div>`, 36)}).addTo(map_el)
-    .bindTooltip(truck.destLabel, {permanent:true, direction:'top', offset:[0,-18], className:'leaflet-tooltip'});
+  document.getElementById('speed-display').innerHTML = Math.round((t.speed||0)*3.6) + ' <span>km/h</span>';
 
-  // Route
-  routeLine = L.polyline(truck.route, {color:'#E05A1A', weight:3, opacity:.5, dashArray:'6,6'}).addTo(map_el);
-
-  const bounds = L.latLngBounds([pos, truck.dest]);
-  map_el.fitBounds(bounds, {padding:[60,60]});
+  const secsAgo = Math.round((Date.now() - (t.updatedAt||Date.now()))/1000);
+  document.querySelector('.mo-update').innerHTML = `<span class="mo-dot"></span> Mis à jour il y a ${secsAgo}s`;
 }
 
-// Animate truck
-function animateTruck() {
-  animFrame++;
-  if(animFrame % 60 === 0) { // every ~1s
-    const truck = TRUCKS[currentTruck];
-    truck.progress = Math.min(truck.progress + 0.002, 0.999);
-    const pos = getTruckPos(truck);
-    if(truckMarker) truckMarker.setLatLng(pos);
+function renderFleetList() {
+  const wrap = document.getElementById('fleet-view');
+  const keys = Object.keys(liveTrucksData);
+  document.querySelector('.fleet-badge').textContent = keys.length + ' en ligne';
 
-    // Update speed display randomly
-    const speed = Math.round(80 + Math.random()*30);
-    document.getElementById('speed-display').innerHTML = speed + ' <span>km/h</span>';
+  const container = wrap.querySelector('.sb-scroll') || wrap;
+  // Clear existing truck-cards (keep fleet-head)
+  wrap.querySelectorAll('.truck-card').forEach(el => el.remove());
+
+  if(keys.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:2rem 1rem;text-align:center;color:var(--muted);font-size:.875rem';
+    empty.textContent = 'Aucun chauffeur ne partage sa position actuellement.';
+    empty.className = 'truck-card';
+    empty.style.border = 'none';
+    wrap.appendChild(empty);
+    return;
   }
-  requestAnimationFrame(animateTruck);
+
+  keys.forEach((key, i) => {
+    const t = liveTrucksData[key];
+    const card = document.createElement('div');
+    card.className = 'truck-card' + (key === currentTruckKey ? ' selected' : '');
+    card.onclick = () => selectLiveTruck(key, card);
+    const secsAgo = Math.round((Date.now() - (t.updatedAt||Date.now()))/1000);
+    card.innerHTML = `
+      <div class="tc-head">
+        <div class="tc-ico">🚚</div>
+        <div class="tc-name">${t.truckId || key}</div>
+        <div class="tc-status ${t.online ? 'en-route' : 'pause'}">${t.online ? 'En ligne' : 'Hors ligne'}</div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-stat"><div class="tc-stat-val">${Math.round((t.speed||0)*3.6)} km/h</div><div class="tc-stat-lbl">Vitesse</div></div>
+        <div class="tc-stat"><div class="tc-stat-val">${t.driver||'—'}</div><div class="tc-stat-lbl">Chauffeur</div></div>
+        <div class="tc-stat"><div class="tc-stat-val">±${Math.round(t.accuracy||0)}m</div><div class="tc-stat-lbl">Précision</div></div>
+        <div class="tc-stat"><div class="tc-stat-val">${secsAgo}s</div><div class="tc-stat-lbl">Mis à jour</div></div>
+      </div>`;
+    wrap.appendChild(card);
+  });
 }
 
-renderTruck(0);
-animateTruck();
+function selectLiveTruck(key) {
+  currentTruckKey = key;
+  renderLiveTruck(key);
+  renderFleetList();
+}
+
+window.onLiveTrucksUpdate = function(data) {
+  liveTrucksData = data;
+  const keys = Object.keys(data);
+
+  if(!currentTruckKey && keys.length > 0) currentTruckKey = keys[0];
+  if(currentTruckKey && data[currentTruckKey]) renderLiveTruck(currentTruckKey);
+
+  renderFleetList();
+};
+
+// If Firebase already has data before listener attached
+if(window.__liveTrucks) window.onLiveTrucksUpdate(window.__liveTrucks);
 
 // View toggle
 function setView(v) {
@@ -432,36 +392,15 @@ function setView(v) {
     document.getElementById('client-view').style.display = 'flex';
     document.getElementById('fleet-view').style.display = 'none';
     document.getElementById('sb-title').textContent = 'Votre déménagement';
-    document.getElementById('sb-sub').textContent = 'Commande #NS-2847 · Paris → Lyon';
-    currentTruck = 0;
-    renderTruck(0);
+    document.getElementById('sb-sub').textContent = 'Suivi en direct du chauffeur';
   } else {
     document.getElementById('client-view').style.display = 'none';
     document.getElementById('fleet-view').style.display = 'flex';
     document.getElementById('sb-title').textContent = 'Tableau de bord flotte';
-    document.getElementById('sb-sub').textContent = '3 camions actifs aujourd\'hui';
+    document.getElementById('sb-sub').textContent = Object.keys(liveTrucksData).length + ' camion(s) connecté(s)';
+    renderFleetList();
   }
 }
-
-function selectTruck(el, idx) {
-  document.querySelectorAll('.truck-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  currentTruck = idx;
-  renderTruck(idx);
-}
-
-// ETA countdown
-function updateETA() {
-  const now = new Date();
-  const target = new Date();
-  target.setHours(14,35,0,0);
-  const diff = Math.max(0, Math.floor((target-now)/60000));
-  const h = Math.floor(diff/60), m = diff%60;
-  const label = h > 0 ? `${h}h${m < 10 ? '0'+m : m}` : `${m} min`;
-  document.getElementById('eta-desc').innerHTML = `Dans environ <strong style="color:#fff">${label}</strong> · 38 km restants`;
-}
-updateETA();
-setInterval(updateETA, 30000);
 </script>
 </body>
 </html>

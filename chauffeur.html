@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NidoSync — Espace Chauffeur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCLuAhizDhYrSvyNq0dIkyunmbXpsf-5E",
+  authDomain: "nodosync-pro.firebaseapp.com",
+  databaseURL: "https://nodosync-pro-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "nodosync-pro",
+  storageBucket: "nodosync-pro.firebasestorage.app",
+  messagingSenderId: "673099902451",
+  appId: "1:673099902451:web:5cd27eb5ac04ce0cf77686"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.__db = db;
+window.__ref = ref;
+window.__set = set;
+window.__onDisconnect = onDisconnect;
+window.__serverTimestamp = serverTimestamp;
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#111110;--white:#FAFAF8;--off:#F3F1EC;
+  --orange:#E05A1A;--orange-dim:#FEF0E8;
+  --teal:#17907A;--teal-dim:#E2F5F0;
+  --red:#C0392B;--red-dim:#FDECEA;
+  --muted:#82807A;--border:#E4E1DA;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--off);color:var(--black)}
+.wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:1.5rem}
+
+.header{text-align:center;padding:1.5rem 0 2rem}
+.logo{font-family:var(--serif);font-size:1.5rem;color:var(--black)}
+.logo em{color:var(--orange);font-style:italic}
+.header-sub{font-size:.8125rem;color:var(--muted);margin-top:.25rem}
+
+.id-card{
+  background:#fff;border:1px solid var(--border);border-radius:20px;
+  padding:1.5rem;margin-bottom:1.25rem;
+}
+.fg{margin-bottom:1rem}
+.fg:last-child{margin-bottom:0}
+.fg label{display:block;font-size:.675rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.fg input{
+  width:100%;padding:.875rem 1rem;border:1.5px solid var(--border);border-radius:12px;
+  font-family:var(--sans);font-size:1rem;color:var(--black);background:#fff;outline:none;
+  transition:border-color .15s;
+}
+.fg input:focus{border-color:var(--orange)}
+
+.status-card{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem 1.5rem;
+}
+.status-orb{
+  width:140px;height:140px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;margin-bottom:1.5rem;
+  background:var(--off);border:2px dashed var(--border);
+  transition:all .4s;
+}
+.status-orb.active{
+  background:var(--teal);border:none;
+  box-shadow:0 0 0 8px var(--teal-dim);
+  animation:breathe 2.5s ease-in-out infinite;
+}
+.status-orb.error{background:var(--red);border:none;box-shadow:0 0 0 8px var(--red-dim)}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.status-title{font-family:var(--serif);font-size:1.625rem;font-weight:400;margin-bottom:.5rem}
+.status-desc{font-size:.875rem;color:var(--muted);max-width:280px;line-height:1.6;margin-bottom:.5rem}
+
+.live-data{
+  background:#fff;border:1px solid var(--border);border-radius:16px;
+  padding:1.25rem;width:100%;margin-top:1.5rem;display:none;
+}
+.live-data.show{display:block}
+.ld-row{display:flex;justify-content:space-between;align-items:center;padding:.625rem 0;border-bottom:1px solid var(--off)}
+.ld-row:last-child{border:none}
+.ld-key{font-size:.8125rem;color:var(--muted)}
+.ld-val{font-size:.875rem;font-weight:600;font-variant-numeric:tabular-nums}
+
+.btn-toggle{
+  width:100%;padding:1.125rem;border:none;border-radius:100px;
+  font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.75rem;
+  transition:all .2s;margin-top:1.5rem;
+}
+.btn-toggle.start{
+  background:var(--orange);color:#fff;
+  box-shadow:0 4px 24px rgba(224,90,26,.3);
+}
+.btn-toggle.start:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(224,90,26,.4)}
+.btn-toggle.stop{
+  background:var(--off);color:var(--red);border:2px solid var(--red);
+}
+.btn-toggle:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+.footer-note{
+  text-align:center;font-size:.75rem;color:var(--muted);
+  padding-top:1.5rem;line-height:1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <div class="logo">Nido<em>Sync</em></div>
+    <div class="header-sub">Espace chauffeur · Partage de position</div>
+  </div>
+
+  <div class="id-card" id="id-card">
+    <div class="fg">
+      <label>Numéro de camion</label>
+      <input type="text" id="truck-id" placeholder="AB-421-CD" value="AB-421-CD"/>
+    </div>
+    <div class="fg">
+      <label>Votre nom</label>
+      <input type="text" id="driver-name" placeholder="Karim M."/>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-orb" id="orb">📍</div>
+    <div class="status-title" id="status-title">Position non partagée</div>
+    <div class="status-desc" id="status-desc">Renseignez votre camion et appuyez sur le bouton pour commencer à partager votre position avec NidoSync.</div>
+
+    <div class="live-data" id="live-data">
+      <div class="ld-row"><span class="ld-key">Latitude</span><span class="ld-val" id="ld-lat">—</span></div>
+      <div class="ld-row"><span class="ld-key">Longitude</span><span class="ld-val" id="ld-lng">—</span></div>
+      <div class="ld-row"><span class="ld-key">Précision</span><span class="ld-val" id="ld-acc">—</span></div>
+      <div class="ld-row"><span class="ld-key">Dernière mise à jour</span><span class="ld-val" id="ld-time">—</span></div>
+    </div>
+  </div>
+
+  <button class="btn-toggle start" id="btn-toggle" onclick="toggleSharing()">
+    <span>▶</span> Démarrer le partage
+  </button>
+
+  <div class="footer-note">
+    Votre position n'est visible que par NidoSync et vos clients pendant le trajet. Elle s'arrête automatiquement si vous fermez cette page.
+  </div>
+</div>
+
+<script>
+let watchId = null;
+let sharing = false;
+let truckId = '';
+
+function toggleSharing() {
+  if(!sharing) startSharing();
+  else stopSharing();
+}
+
+function startSharing() {
+  truckId = document.getElementById('truck-id').value.trim();
+  const driverName = document.getElementById('driver-name').value.trim();
+
+  if(!truckId) { alert('Renseignez le numéro de camion.'); return; }
+  if(!navigator.geolocation) { alert('Géolocalisation non supportée sur ce navigateur.'); return; }
+
+  document.getElementById('id-card').style.opacity = '0.5';
+  document.getElementById('id-card').style.pointerEvents = 'none';
+
+  const btn = document.getElementById('btn-toggle');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Activation du GPS...';
+
+  watchId = navigator.geolocation.watchPosition(
+    pos => onPosition(pos, truckId, driverName),
+    err => onError(err),
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+  );
+}
+
+function onPosition(pos, truckId, driverName) {
+  const { latitude, longitude, accuracy, speed } = pos.coords;
+  sharing = true;
+
+  // UI update
+  const orb = document.getElementById('orb');
+  orb.classList.remove('error');
+  orb.classList.add('active');
+  orb.textContent = '🚚';
+  document.getElementById('status-title').textContent = 'Position partagée en direct';
+  document.getElementById('status-desc').textContent = 'Votre client et NidoSync peuvent voir votre position en temps réel.';
+  document.getElementById('live-data').classList.add('show');
+  document.getElementById('ld-lat').textContent = latitude.toFixed(5);
+  document.getElementById('ld-lng').textContent = longitude.toFixed(5);
+  document.getElementById('ld-acc').textContent = Math.round(accuracy) + ' m';
+  document.getElementById('ld-time').textContent = new Date().toLocaleTimeString('fr-FR');
+
+  const btn = document.getElementById('btn-toggle');
+  btn.disabled = false;
+  btn.className = 'btn-toggle stop';
+  btn.innerHTML = '<span>⏹</span> Arrêter le partage';
+
+  // Push to Firebase
+  const { __db, __ref, __set, __onDisconnect, __serverTimestamp } = window;
+  const truckRef = __ref(__db, 'trucks/' + truckId.replace(/[.#$\[\]]/g,'_'));
+  __set(truckRef, {
+    lat: latitude,
+    lng: longitude,
+    accuracy: accuracy,
+    speed: speed || 0,
+    driver: driverName || 'Chauffeur',
+    truckId: truckId,
+    updatedAt: Date.now(),
+    online: true
+  });
+  __onDisconnect(truckRef).update({ online: false });
+}
+
+function onError(err) {
+  const orb = document.getElementById('orb');
+  orb.classList.remove('active');
+  orb.classList.add('error');
+  orb.textContent = '⚠️';
+  document.getElementById('status-title').textContent = 'Erreur de géolocalisation';
+  document.getElementById('status-desc').textContent = err.message || 'Vérifiez que la localisation est autorisée pour ce site.';
+  const btn = document.getElementById('btn-toggle');
+  btn.disabled = false;
+  btn.className = 'btn-toggle start';
+  btn.innerHTML = '<span>▶</span> Réessayer';
+}
+
+function stopSharing() {
+  if(watchId !== null) navigator.geolocation.clearWatch(watchId);
+  sharing = false;
+
+  if(truckId) {
+    const { __db, __ref, __set } = window;
+    const truckRef = __ref(__db, 'trucks/' + truckId.replace(/[.#$\[\]]/g,'_'));
+    __set(truckRef, null).catch(()=>{});
+  }
+
+  const orb = document.getElementById('orb');
+  orb.classList.remove('active','error');
+  orb.textContent = '📍';
+  document.getElementById('status-title').textContent = 'Partage arrêté';
+  document.getElementById('status-desc').textContent = 'Votre position n\\'est plus visible.';
+  document.getElementById('live-data').classList.remove('show');
+
+  document.getElementById('id-card').style.opacity = '1';
+  document.getElementById('id-card').style.pointerEvents = 'auto';
+
+  const btn = document.getElementById('btn-toggle');
+  btn.className = 'btn-toggle start';
+  btn.innerHTML = '<span>▶</span> Démarrer le partage';
+}
+</script>
+</body>
+</html>
