@@ -203,7 +203,7 @@ onValue(trucksRef, (snapshot) => {
     <a href="stockage.html" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none">📦 Stockage</a>
     <a href="chauffeur.html" style="font-size:.875rem;font-weight:500;color:var(--teal);text-decoration:none">📍 Espace chauffeur</a>
     <a href="admin.html" style="font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none">📋 Démarches</a>
-    <div class="view-toggle">
+    <div class="view-toggle" id="view-toggle">
       <button class="vt-btn active" onclick="setView('client')">👤 Client</button>
       <button class="vt-btn" onclick="setView('fleet')">📊 Flotte</button>
     </div>
@@ -274,6 +274,14 @@ onValue(trucksRef, (snapshot) => {
 
 <script>
 // ── ÉTAT LIVE (Firebase) ──
+const urlParams = new URLSearchParams(location.search);
+const lockedOrderId = urlParams.get('id'); // si présent, mode client verrouillé sur 1 commande
+
+if (lockedOrderId) {
+  // Un client avec un lien dédié ne doit jamais voir la flotte d'autres clients
+  document.getElementById('view-toggle')?.remove();
+}
+
 let liveTrucksData = {};
 let currentTruckKey = null;
 let map, truckMarker, destMarker, routeLine;
@@ -428,11 +436,35 @@ window.onLiveTrucksUpdate = function(data) {
   liveTrucksData = data;
   const keys = Object.keys(data);
 
+  if (lockedOrderId) {
+    // Mode client verrouillé : on ne regarde QUE cette commande
+    const safeKey = lockedOrderId.replace(/[.#$\[\]]/g,'_');
+    if (data[safeKey]) {
+      currentTruckKey = safeKey;
+      renderLiveTruck(safeKey);
+      document.getElementById('empty-order-msg')?.remove();
+    } else {
+      // Aucun chauffeur connecté pour cette commande
+      showNoTruckMessage();
+    }
+    return; // on ignore le reste, pas de fleet list pour un client
+  }
+
+  // Mode interne (déménageur) : comportement normal
   if(!currentTruckKey && keys.length > 0) currentTruckKey = keys[0];
   if(currentTruckKey && data[currentTruckKey]) renderLiveTruck(currentTruckKey);
 
   renderFleetList();
 };
+
+function showNoTruckMessage() {
+  document.getElementById('eta-time').textContent = '—';
+  document.getElementById('eta-desc').textContent = 'En attente que le chauffeur démarre le partage de position pour votre commande.';
+  const nameEl = document.getElementById('truck-info-name');
+  const detailEl = document.getElementById('truck-info-detail');
+  if(nameEl) nameEl.textContent = 'Aucun chauffeur connecté';
+  if(detailEl) detailEl.textContent = 'Commande ' + lockedOrderId;
+}
 
 // If Firebase already has data before listener attached
 if(window.__liveTrucks) window.onLiveTrucksUpdate(window.__liveTrucks);
@@ -446,7 +478,7 @@ function setView(v) {
     document.getElementById('client-view').style.display = 'flex';
     document.getElementById('fleet-view').style.display = 'none';
     document.getElementById('sb-title').textContent = 'Votre déménagement';
-    document.getElementById('sb-sub').textContent = 'Suivi en direct du chauffeur';
+    document.getElementById('sb-sub').textContent = lockedOrderId ? ('Commande ' + lockedOrderId) : 'Suivi en direct du chauffeur';
   } else {
     document.getElementById('client-view').style.display = 'none';
     document.getElementById('fleet-view').style.display = 'flex';
